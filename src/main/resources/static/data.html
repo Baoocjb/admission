@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>平行志愿模拟录取系统-统计数据</title>
+
+</head>
+<body>
+<div id="app">
+    <el-container style="height: 100%; border: 1px solid #eee">
+
+        <!--侧栏-->
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246);font-weight:bold;">
+            <el-menu>
+                <el-submenu index="1">
+                    <template slot="title"><i class="el-icon-message"></i>志愿信息类</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="1-1">
+                            <p><a href="index.html">志愿信息</a></p>
+                        </el-menu-item>
+                        <el-menu-item index="1-2">
+                            <p><a href="plan.html">招生计划</a></p>
+                        </el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+
+                <el-submenu index="2">
+                    <template slot="title"><i class="el-icon-setting"></i>录取记录类</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="2-1">
+                            <a href="admission.html">拟录取表</a>
+                        </el-menu-item>
+                        <el-menu-item index="2-2">
+                            <a href="data.html">统计数据</a>
+                        </el-menu-item>
+                        <el-menu-item index="2-3">
+                            <a href="back.html">退档队列</a>
+                        </el-menu-item>
+                    </el-menu-item-group>
+
+                </el-submenu>
+            </el-menu>
+        </el-aside>
+
+        <!--头部-->
+        <el-container>
+            <el-header class="header">
+                <span>平行志愿模拟录取系统-统计数据</span>
+                <span>欢迎您！</span>
+            </el-header>
+
+            <!--中间主题表格-->
+            <el-main>
+                <!--搜索表单-->
+                <el-form :inline="true" :model="absoluteTable" class="demo-form-inline">
+
+                    <el-form-item label="学院">
+                        <el-input v-model="absoluteTable.college" placeholder="学院"></el-input>
+                    </el-form-item>
+
+                    <el-form-item>
+                        <el-button type="primary" @click="">查询</el-button>
+                        <el-button type="primary" @click="">前1%</el-button>
+                        <el-button type="success" @click="">导出前1%</el-button>
+                    </el-form-item>
+                </el-form>
+
+                <!--表格-->
+                <template>
+                    <el-table
+                            :data="tableData"
+                            style="width: 100%"
+                            :row-class-name="tableRowClassName"
+                            @selection-change="handleSelectionChange">
+                        <el-table-column
+                                type="selection">
+                        </el-table-column>
+                        <el-table-column
+                                type="index">
+                        </el-table-column>
+                        <el-table-column
+                                prop="name"
+                                label="姓名"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="score"
+                                label="总分"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="rank"
+                                label="排位"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="number"
+                                label="专业代号"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="code"
+                                label="专业代码"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="college"
+                                label="学院"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="major"
+                                label="专业"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="record"
+                                label="录取记录"
+                                align="center">
+                        </el-table-column>
+
+                    </el-table>
+                </template>
+
+                <!--分页工具条-->
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage"
+                        :page-sizes="[5, 10, 15, 20]"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="totalCount">
+                </el-pagination>
+
+            </el-main>
+        </el-container>
+    </el-container>
+
+</div>
+
+<script src="js/vue.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+<link rel="stylesheet" href="css/admission.css">
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+
+        //生命周期相关方法,页面加载完成后执行的函数
+        mounted() {
+            this.selectAll();
+            axios({
+                method: "get",
+                url:"http://localhost:8080/car-system/user/getUserMsg"
+            }).then( (resp) => {
+                console.log(resp.data);
+                // 设置username
+                if (resp.data.uid == "admin"){
+                    //管理员登录
+                    this.admin = resp.data.uid;
+                    this.disabled = true;
+                }else {
+                    //普通用户登录
+                    this.username = resp.data.username;
+                    this.uid = resp.data.uid;
+                }
+            });
+        },
+
+        //方法
+        methods: {
+
+            selectAll() {
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/car-system/histroy/selectByPageAndCondition?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
+                    data:this.absoluteTable
+                }).then((resp) => {
+                    // 设置表格数据
+                    this.tableData = resp.data.rows;
+                    // 设置总条目数
+                    this.totalCount = resp.data.totalCount;
+                })
+                console.log(this.uid);
+                console.log(this.tableData[2]);
+            },
+
+            // 分页工具条方法
+            handleSizeChange(val) {
+                // 重新设置每页显示的条数
+                this.pageSize = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.selectAll();
+            },
+            handleCurrentChange(val) {
+                // 重新设置当前页码
+                this.currentPage = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.selectAll();
+            },
+            //表格变色方法
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex % 2 === 1) {
+                    return 'success-row';
+                } else {
+                    return 'warning-row';
+                }
+                return '';
+            },
+            //表格复选框绑定事件
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+
+                console.log(this.multipleSelection)
+            },
+            //搜索表单方法
+            onSubmit() {
+                //console.log(this.history);
+                this.selectAll();
+            },
+
+        },
+
+        //数据
+        data() {
+            return {
+                //按钮点击权限
+                disabled: true,
+                // 总记录数量
+                totalCount: 10,
+                // 当前页码
+                currentPage: 1,
+                // 每页记录数
+                pageSize: 5,
+                // 删除功能对话框
+                dialogVisible: false,
+                // 搜索表单数据
+                absoluteTable: {
+                    college:'',
+                },
+                // 复选框数据集合
+                multipleSelection: [],
+                // 表格数据
+                tableData: [{
+                    name: "小黑",
+                    score: "599",
+                    rank: "25888",
+                    number: "002",
+                    code: "0802",
+                    college: '机电学院',
+                    major: '机械类',
+                    //录取记录
+                    record: '已录取'
+                }, {
+                    name: "小黑",
+                    score: "599",
+                    rank: "25888",
+                    number: "002",
+                    code: "0802",
+                    college: '机电学院',
+                    major: '机械类',
+                    record: '已录取'
+                }, {
+                    name: "小黑",
+                    score: "599",
+                    rank: "25888",
+                    number: "002",
+                    code: "0802",
+                    college: '机电学院',
+                    major: '机械类',
+                    record: '已录取'
+                }]
+            }
+        }
+    })
+</script>
+</body>
+</html>

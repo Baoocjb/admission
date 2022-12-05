@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>平行志愿模拟录取系统-招生计划</title>
+</head>
+<body>
+<div id="app">
+    <el-container style="height: 100%; border: 1px solid #eee">
+
+        <!--侧栏-->
+        <el-aside width="200px" style="background-color: rgb(238, 241, 246);font-weight:bold;">
+            <el-menu>
+                <el-submenu index="1">
+                    <template slot="title"><i class="el-icon-message"></i>志愿信息类</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="1-1">
+                            <p><a href="index.html">志愿信息</a></p>
+                        </el-menu-item>
+                        <el-menu-item index="1-2">
+                            <p><a href="plan.html">招生计划</a></p>
+                        </el-menu-item>
+                    </el-menu-item-group>
+                </el-submenu>
+
+                <el-submenu index="2">
+                    <template slot="title"><i class="el-icon-setting"></i>录取记录类</template>
+                    <el-menu-item-group>
+                        <el-menu-item index="2-1">
+                            <a href="admission.html">拟录取表</a>
+                        </el-menu-item>
+                        <el-menu-item index="2-2">
+                            <a href="data.html">统计数据</a>
+                        </el-menu-item>
+                        <el-menu-item index="2-3">
+                            <a href="back.html">退档队列</a>
+                        </el-menu-item>
+                    </el-menu-item-group>
+
+                </el-submenu>
+            </el-menu>
+        </el-aside>
+
+        <!--头部-->
+        <el-container>
+            <el-header class="header">
+                <span>平行志愿模拟录取系统-招生计划</span>
+                <span>欢迎您！</span>
+            </el-header>
+
+            <!--中间主题表格-->
+            <el-main>
+                <!--上传按钮-->
+                <el-row>
+                    <el-upload
+                            class="upload-demo"
+                            action="https://jsonplaceholder.typicode.com/posts/"
+                            :on-preview="handlePreview"
+                            :on-remove="handleRemove"
+                            :before-remove="beforeRemove"
+                            multiple
+                            :limit="3"
+                            :on-exceed="handleExceed"
+                            :file-list="fileList">
+                        <el-button size="middle" type="primary">招生计划导入</el-button>
+                    </el-upload>
+                    <br>
+                    <el-button type="success" @click="" >开始录取</el-button>
+                </el-row>
+
+                <!--表格-->
+                <template visibility="hidden" >
+                    <el-table
+                            :data="tableData"
+                            style="width: 100%"
+                            :row-class-name="tableRowClassName"
+                            @selection-change="handleSelectionChange">
+                        <el-table-column
+                                type="selection">
+                        </el-table-column>
+                        <el-table-column
+                                type="index"
+                                >
+                        </el-table-column>
+                        <el-table-column
+                                prop="number"
+                                label="专业代号"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="code"
+                                label="专业代码"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="college"
+                                label="学院"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="major"
+                                label="专业名称"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="remarks"
+                                label="备注"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="years"
+                                label="学制年限"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="need"
+                                label="招生计划数"
+                                align="center">
+
+                        </el-table-column>
+                        <el-table-column
+                                label="修改"
+                                align="center">
+                            <el-row>
+                                <el-button type="warning" plain @click="">修改</el-button>
+                            </el-row>
+                        </el-table-column>
+                        <el-table-column
+                                label="删除"
+                                align="center">
+                            <el-row>
+                                <el-button type="danger" plain @click="">删除</el-button>
+                            </el-row>
+                        </el-table-column>
+                    </el-table>
+                </template>
+
+                <!--分页工具条-->
+                <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="currentPage"
+                        :page-sizes="[5, 10, 15, 200]"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="totalCount">
+                </el-pagination>
+
+            </el-main>
+        </el-container>
+    </el-container>
+
+</div>
+
+<script src="js/vue.js"></script>
+<script src="element-ui/lib/index.js"></script>
+<link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
+<link rel="stylesheet" href="css/index.css">
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    new Vue({
+        el: "#app",
+
+        //生命周期相关方法,页面加载完成后执行的函数
+        mounted(){
+
+        },
+
+        //方法
+        methods: {
+            //查询所有汽车信息
+            selectAll(){
+                axios({
+                    method: "get",
+                    url:"http://localhost:8080/car-system/car/selectByPage?currentPage="+this.currentPage+"&pageSize="+this.pageSize
+                }).then( (resp) => {
+                    // 设置表格数据
+                    this.tableData = resp.data.rows;
+                    // 设置总条目数
+                    this.totalCount = resp.data.totalCount;
+                })
+            },
+
+            // 分页工具条方法
+            handleSizeChange(val) {
+                // 重新设置每页显示的条数
+                this.pageSize = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.selectAll();
+            },
+            handleCurrentChange(val) {
+                // 重新设置当前页码
+                this.currentPage = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.selectAll();
+            },
+
+            //表格相关方法
+            tableRowClassName({row, rowIndex}) {
+                if (rowIndex % 2 === 1) {
+                    return 'success-row';
+                } else {
+                    return 'warning-row';
+                }
+                return '';
+            },
+
+            //表格复选框绑定事件
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+
+                console.log(this.multipleSelection)
+            },
+
+            //下面是志愿信息上传的方法
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePreview(file) {
+                console.log(file);
+            },
+            handleExceed(files, fileList) {
+                this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+            },
+            beforeRemove(file, fileList) {
+                return this.$confirm(`确定移除 ${ file.name }？`);
+            }
+        },
+
+        //数据
+        data() {
+            return {
+                //按钮权限
+                disabled: true,
+                //被选中的cid数组
+                selectedCids:[],
+                // 总记录数量
+                totalCount:10,
+                // 当前页码
+                currentPage: 1,
+                // 每页记录数
+                pageSize: 5,
+                // 删除功能对话框
+                dialogVisible: false,
+                //点击上传功能
+                fileList: [],
+                // 复选框数据集合
+                multipleSelection: [],
+                // 表格数据
+                tableData: [{
+                    number: "001",
+                    code: "0802",
+                    college: '机电学院',
+                    major: '机械类',
+                    remarks: '广东理科',
+                    years: '4',
+                    need: '468'
+                }, {
+                    number: "001",
+                    code: "0802",
+                    college: '机电学院',
+                    major: '机械类',
+                    remarks: '广东理科',
+                    years: '4',
+                    need: '468'
+                }, {
+                    number: "001",
+                    code: "0802",
+                    college: '机电学院',
+                    major: '机械类',
+                    remarks: '广东理科',
+                    years: '4',
+                    need: '468'
+                }]
+            }
+        }
+    })
+</script>
+</body>
+</html>

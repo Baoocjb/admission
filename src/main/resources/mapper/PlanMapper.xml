@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gdut.admission.mapper.PlanMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.gdut.admission.entity.Plan">
+        <id column="id" property="id" />
+        <result column="group_id" property="groupId" />
+        <result column="profession_id" property="professionId" />
+        <result column="profession_name" property="professionName" />
+        <result column="college_name" property="collegeName" />
+        <result column="plan_num" property="planNum" />
+        <result column="comment" property="comment" />
+        <result column="location" property="location" />
+        <result column="language" property="language" />
+        <result column="test_limit1" property="testLimit1" />
+        <result column="test_limit2" property="testLimit2" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, group_id, profession_id, profession_name, college_name, plan_num, comment, location, language, test_limit1, test_limit2
+    </sql>
+
+</mapper>

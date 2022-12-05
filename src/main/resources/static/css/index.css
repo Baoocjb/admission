@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}
+
+.el-header {
+    background-color: #B3C0D1;
+    color: #333;
+    line-height: 60px;
+}
+
+.el-aside {
+    color: #333;
+}
+
+html, body, #app {
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+
+.el-table .warning-row {
+    background: oldlace;
+}
+
+.el-table .success-row {
+    background: #f0f9eb;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    background: #373D3F;
+    color: white;
+    font-weight:bold;
+}
