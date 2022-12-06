@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.gdut.admission.dto.Result;
 import com.gdut.admission.entity.Stu;
@@ -14,9 +15,11 @@ import com.gdut.admission.listener.StuListener;
 import com.gdut.admission.mapper.StuMapper;
 import com.gdut.admission.service.IStuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -31,6 +34,7 @@ import java.io.IOException;
  */
 @Service
 public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuService {
+
 
     /**
      * 导入学生志愿信息至数据库中
@@ -51,7 +55,7 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
                     Stu.class,
                     new StuListener(this)
             ).build();
-            ReadSheet readSheet = EasyExcel.readSheet(1).build();
+            ReadSheet readSheet = EasyExcel.readSheet(0).build();
             excelReader.read(readSheet);
             excelReader.finish();
         } catch (IOException e) {
@@ -74,5 +78,33 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
         page(stuPage, stuLambdaUpdateWrapper);
         stuPage.setPages(currentPage);
         return Result.ok(stuPage);
+    }
+
+    @Override
+    public Result update(Stu stu) {
+        if(stu.getName() == null
+                || stu.getScore() == null
+                || stu.getAdOne() == null
+                || stu.getLanguage() == null
+                || stu.getIsSwap() == null
+                || stu.getStuRank() == null
+                || stu.getId() == null
+        ){
+            return Result.fail("参数不能为空!");
+        }
+        if(getById(stu.getId()) == null){
+            return Result.fail("待删除记录不存在");
+        }
+        this.update(stu);
+        return Result.ok();
+    }
+
+    @Override
+    public Result deleteStu(Integer stuId) {
+        if(stuId == null || getById(stuId) == null){
+            return Result.fail("待删除记录不存在!");
+        }
+        removeById(stuId);
+        return Result.ok();
     }
 }

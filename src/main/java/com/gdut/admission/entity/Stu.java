@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
  * <p>
@@ -14,7 +15,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author Bao
- * @since 2022-12-05
+ * @since 2022-12-06
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -27,85 +28,81 @@ public class Stu implements Serializable {
     private Long id;
 
     /**
-     * 考生号
-     */
-    @ExcelProperty(index = 0)
-    private String stuNum;
-
-    /**
      * 学生姓名
      */
-    @ExcelProperty(index = 1)
+    @ExcelProperty("姓名")
     private String name;
-
-    /**
-     * 专业组号
-     */
-    @ExcelProperty(index = 2)
-    private Integer groupId;
 
     /**
      * 投档成绩
      */
-    @ExcelProperty(index = 3)
+    @ExcelProperty("总分")
     private Double score;
-
-    /**
-     * 服从调剂
-     */
-    @ExcelProperty(index = 4)
-    private String isSwap;
 
     /**
      * 专业志愿1
      */
-    @ExcelProperty(index = 5)
+    @ExcelProperty("志愿1")
     private String adOne;
 
     /**
      * 专业志愿2
      */
-    @ExcelProperty(index = 6)
+    @ExcelProperty("志愿2")
     private String adTwo;
 
     /**
      * 专业志愿3
      */
-    @ExcelProperty(index = 7)
+    @ExcelProperty("志愿3")
     private String adThree;
 
     /**
      * 专业志愿4
      */
-    @ExcelProperty(index = 8)
+    @ExcelProperty("志愿4")
     private String adFour;
 
     /**
      * 专业志愿5
      */
-    @ExcelProperty(index = 9)
+    @ExcelProperty("志愿5")
     private String adFive;
 
     /**
      * 专业志愿6
      */
-    @ExcelProperty(index = 10)
+    @ExcelProperty("志愿6")
     private String adSix;
+
+    /**
+     * 服从调剂
+     */
+    @ExcelProperty("调剂")
+    private Integer isSwap;
+
+    /**
+     * 学生排位
+     */
+    @ExcelProperty("排位")
+    private Integer stuRank;
 
     /**
      * 外语语种
      */
-    @ExcelProperty(index = 11)
+    @ExcelProperty("外语语种")
     private String language;
 
     /**
      * 体检备注
      */
-    @ExcelProperty(index = 12)
+    @ExcelProperty("体检筛选备注")
     private String bodyTest;
 
     /**
      * 录取状态: 0 未录取, 1 已录取, 2 退档
      */
     private Integer status;
+
+
 }

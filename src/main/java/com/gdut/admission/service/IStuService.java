@@ -18,4 +18,8 @@ public interface IStuService extends IService<Stu> {
     Result upload(MultipartFile file);
 
     Result index(int currentPage, int pageSize);
+
+    Result update(Stu stu);
+
+    Result deleteStu(Integer stuId);
 }

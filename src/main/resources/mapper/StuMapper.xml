@@ -5,24 +5,24 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.gdut.admission.entity.Stu">
         <id column="id" property="id" />
-        <result column="stu_num" property="stuNum" />
         <result column="name" property="name" />
-        <result column="group_id" property="groupId" />
         <result column="score" property="score" />
-        <result column="is_swap" property="isSwap" />
         <result column="ad_one" property="adOne" />
         <result column="ad_two" property="adTwo" />
         <result column="ad_three" property="adThree" />
         <result column="ad_four" property="adFour" />
         <result column="ad_five" property="adFive" />
         <result column="ad_six" property="adSix" />
+        <result column="is_swap" property="isSwap" />
+        <result column="stu_rank" property="stuRank" />
         <result column="language" property="language" />
         <result column="body_test" property="bodyTest" />
+        <result column="status" property="status" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, stu_num, name, group_id, score, is_swap, ad_one, ad_two, ad_three, ad_four, ad_five, ad_six, language, body_test
+        id, name, score, ad_one, ad_two, ad_three, ad_four, ad_five, ad_six, is_swap, rank, language, body_test, status
     </sql>
 
 </mapper>

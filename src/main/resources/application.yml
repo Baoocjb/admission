@@ -8,3 +8,9 @@ spring:
 logging:
   level:
     com.hmdp: debug
+
+#打印sql语句
+#mybatis-plus:
+#  configuration:
+#    log-impl:
+#      org.apache.ibatis.logging.stdout.StdOutImpl

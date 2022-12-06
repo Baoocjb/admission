@@ -57,7 +57,7 @@ public class StuController {
      */
     @PostMapping("update")
     public Result update(@RequestBody Stu stu){
-        return null;
+        return stuService.update(stu);
     }
 
     /**
@@ -65,6 +65,6 @@ public class StuController {
      */
     @PostMapping("delete")
     public Result delete(Integer stuId){
-        return null;
+        return stuService.deleteStu(stuId);
     }
 }

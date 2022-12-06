@@ -29,61 +29,61 @@ public class Plan implements Serializable {
     /**
      * 专业组号	
      */
-    @ExcelProperty(index = 0)
+    @ExcelProperty("专业组号")
     private Integer groupId;
 
     /**
      * 专业代号
      */
-    @ExcelProperty(index = 1)
+    @ExcelProperty("专业代号")
     private String professionId;
 
     /**
      * 专业名称
      */
-    @ExcelProperty(index = 2)
+    @ExcelProperty("专业名称")
     private String professionName;
 
     /**
      * 学院名称
      */
-    @ExcelProperty(index = 3)
+    @ExcelProperty("学院名称")
     private String collegeName;
 
     /**
      * 招生计划
      */
-    @ExcelProperty(index = 4)
+    @ExcelProperty("招生计划数")
     private Integer planNum;
 
     /**
      * 专业备注
      */
-    @ExcelProperty(index = 5)
+    @ExcelProperty("专业备注")
     private String comment;
 
     /**
      * 办学地点
      */
-    @ExcelProperty(index = 6)
+    @ExcelProperty("办学地点")
     private String location;
 
     /**
      * 语种限制
      */
-    @ExcelProperty(index = 7)
+    @ExcelProperty("外语语种")
     private String language;
 
     /**
      * 体检限制1
      */
-    @ExcelProperty(index = 8)
+    @ExcelProperty("体检受限1")
     private String testLimit1;
 
     /**
      * 体检限制2
      */
-    @ExcelProperty(index = 9)
+    @ExcelProperty("体检受限2")
     private String testLimit2;
 
 
