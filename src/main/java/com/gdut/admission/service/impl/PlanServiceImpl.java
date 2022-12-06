@@ -70,7 +70,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
     public Result index(int currentPage, int pageSize) {
         Page<Plan> planPage = new Page<>(currentPage, pageSize);
         LambdaUpdateWrapper<Plan> stuLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
-        stuLambdaUpdateWrapper.orderByAsc(Plan::getProfessionId);
+        stuLambdaUpdateWrapper.orderByAsc(Plan::getProfessionNum);
         page(planPage, stuLambdaUpdateWrapper);
         planPage.setPages(currentPage);
         return Result.ok(planPage);

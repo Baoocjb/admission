@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.gdut.admission.entity.Admission">
         <id column="id" property="id" />
         <result column="stu_id" property="stuId" />
-        <result column="profession_id" property="professionId" />
+        <result column="profession_num" property="professionNum" />
     </resultMap>
 
     <!-- 通用查询结果列 -->

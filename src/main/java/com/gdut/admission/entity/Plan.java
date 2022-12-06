@@ -36,7 +36,7 @@ public class Plan implements Serializable {
      * 专业代号
      */
     @ExcelProperty("专业代号")
-    private String professionId;
+    private String professionNum;
 
     /**
      * 专业名称

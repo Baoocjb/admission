@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.gdut.admission.entity.Plan">
         <id column="id" property="id" />
         <result column="group_id" property="groupId" />
-        <result column="profession_id" property="professionId" />
+        <result column="profession_num" property="professionNum" />
         <result column="profession_name" property="professionName" />
         <result column="college_name" property="collegeName" />
         <result column="plan_num" property="planNum" />

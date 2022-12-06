@@ -25,12 +25,12 @@ public class Admission implements Serializable {
     /**
      * 学生id
      */
-    private Integer stuId;
+    private Long stuId;
 
     /**
      * 专业代号
      */
-    private String professionId;
+    private Integer planId;
 
 
 }

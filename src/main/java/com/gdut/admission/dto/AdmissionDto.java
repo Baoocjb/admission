@@ -11,6 +11,7 @@ public class AdmissionDto extends Admission {
     private Double score;
     private String stuRank;
     private String language;
+    private String professionNum;
     private String professionName;
     private String collegeName;
     private String comment;
