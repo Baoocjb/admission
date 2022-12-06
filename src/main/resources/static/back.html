@@ -126,7 +126,7 @@
                 axios({
                     method: "post",
                     url: "http://localhost:8080/car-system/histroy/selectByPageAndCondition?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
-                    data:this.absoluteTable
+                    data: this.absoluteTable
                 }).then((resp) => {
                     // 设置表格数据
                     this.tableData = resp.data.rows;

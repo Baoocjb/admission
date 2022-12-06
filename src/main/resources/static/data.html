@@ -154,15 +154,15 @@
             this.selectAll();
             axios({
                 method: "get",
-                url:"http://localhost:8080/car-system/user/getUserMsg"
-            }).then( (resp) => {
+                url: "http://localhost:8080/car-system/user/getUserMsg"
+            }).then((resp) => {
                 console.log(resp.data);
                 // 设置username
-                if (resp.data.uid == "admin"){
+                if (resp.data.uid == "admin") {
                     //管理员登录
                     this.admin = resp.data.uid;
                     this.disabled = true;
-                }else {
+                } else {
                     //普通用户登录
                     this.username = resp.data.username;
                     this.uid = resp.data.uid;
@@ -177,7 +177,7 @@
                 axios({
                     method: "post",
                     url: "http://localhost:8080/car-system/histroy/selectByPageAndCondition?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
-                    data:this.absoluteTable
+                    data: this.absoluteTable
                 }).then((resp) => {
                     // 设置表格数据
                     this.tableData = resp.data.rows;
@@ -239,7 +239,7 @@
                 dialogVisible: false,
                 // 搜索表单数据
                 absoluteTable: {
-                    college:'',
+                    college: '',
                 },
                 // 复选框数据集合
                 multipleSelection: [],

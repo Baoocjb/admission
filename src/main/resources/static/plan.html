@@ -64,60 +64,64 @@
                             :file-list="fileList">
                         <el-button size="middle" type="primary">招生计划导入</el-button>
                     </el-upload>
-                    <br>
-                    <el-button type="success" @click="" >开始录取</el-button>
                 </el-row>
 
                 <!--表格-->
-                <template visibility="hidden" >
+                <template>
                     <el-table
-                            :data="tableData"
-                            style="width: 100%"
-                            :row-class-name="tableRowClassName"
-                            @selection-change="handleSelectionChange">
+                            :data="plan"
+                            :row-class-name="tableRowClassName">
                         <el-table-column
-                                type="selection">
+                                prop="groupId"
+                                label="专业组号"
+                                align="center">
                         </el-table-column>
                         <el-table-column
-                                type="index"
-                                >
-                        </el-table-column>
-                        <el-table-column
-                                prop="number"
+                                prop="professionId"
                                 label="专业代号"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="code"
-                                label="专业代码"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="college"
-                                label="学院"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="major"
+                                prop="professionName"
                                 label="专业名称"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="remarks"
-                                label="备注"
+                                prop="collegeName"
+                                label="学院名称"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="years"
-                                label="学制年限"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="need"
+                                prop="planNum"
                                 label="招生计划数"
                                 align="center">
-
                         </el-table-column>
+                        <el-table-column
+                                prop="comment"
+                                label="专业备注"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="location"
+                                label="办学地点"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="language"
+                                label="外语语种"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="testLimit1"
+                                label="体检受限1"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="testLimit2"
+                                label="体检受限2"
+                                align="center">
+                        </el-table-column>
+
                         <el-table-column
                                 label="修改"
                                 align="center">
@@ -163,18 +167,18 @@
         el: "#app",
 
         //生命周期相关方法,页面加载完成后执行的函数
-        mounted(){
+        mounted() {
 
         },
 
         //方法
         methods: {
             //查询所有汽车信息
-            selectAll(){
+            selectAll() {
                 axios({
                     method: "get",
-                    url:"http://localhost:8080/car-system/car/selectByPage?currentPage="+this.currentPage+"&pageSize="+this.pageSize
-                }).then( (resp) => {
+                    url: "http://localhost:8080/car-system/car/selectByPage?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
+                }).then((resp) => {
                     // 设置表格数据
                     this.tableData = resp.data.rows;
                     // 设置总条目数
@@ -224,7 +228,7 @@
                 this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
             },
             beforeRemove(file, fileList) {
-                return this.$confirm(`确定移除 ${ file.name }？`);
+                return this.$confirm(`确定移除 ${file.name}？`);
             }
         },
 
@@ -234,9 +238,9 @@
                 //按钮权限
                 disabled: true,
                 //被选中的cid数组
-                selectedCids:[],
+                selectedCids: [],
                 // 总记录数量
-                totalCount:10,
+                totalCount: 10,
                 // 当前页码
                 currentPage: 1,
                 // 每页记录数
@@ -245,33 +249,55 @@
                 dialogVisible: false,
                 //点击上传功能
                 fileList: [],
-                // 复选框数据集合
-                multipleSelection: [],
                 // 表格数据
-                tableData: [{
-                    number: "001",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    remarks: '广东理科',
-                    years: '4',
-                    need: '468'
+                plan: [{
+                    id: '1',
+                    groupId: "201",
+                    professionId: "001",
+                    professionName: '外国语言文学类',
+                    collegeName: '外国语学院',
+                    planNum: '80',
+                    comment: '',
+                    location: '广州地区',
+                    language: '英语',
+                    testLimit1: '',
+                    testLimit2: '',
                 }, {
-                    number: "001",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    remarks: '广东理科',
-                    years: '4',
-                    need: '468'
+                    id: '2',
+                    groupId: "201",
+                    professionId: "002",
+                    professionName: '日语',
+                    collegeName: '外国语学院',
+                    planNum: '30',
+                    comment: '',
+                    location: '广州地区',
+                    language: '英语',
+                    testLimit1: '',
+                    testLimit2: '',
                 }, {
-                    number: "001",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    remarks: '广东理科',
-                    years: '4',
-                    need: '468'
+                    id: '3',
+                    groupId: "203",
+                    professionId: "001",
+                    professionName: '工商管理类',
+                    collegeName: '管理学院',
+                    planNum: '87',
+                    comment: '',
+                    location: '河源地区',
+                    language: '',
+                    testLimit1: '21',
+                    testLimit2: '',
+                }, {
+                    id: '4',
+                    groupId: "204",
+                    professionId: "001",
+                    professionName: '电子商务',
+                    collegeName: '管理学院',
+                    planNum: '50',
+                    comment: '',
+                    location: '河源地区',
+                    language: '',
+                    testLimit1: '',
+                    testLimit2: '23',
                 }]
             }
         }
