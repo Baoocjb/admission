@@ -79,57 +79,52 @@
                 <!--表格-->
                 <template>
                     <el-table
-                            :data="tableData"
+                            :data="admission"
                             style="width: 100%"
-                            :row-class-name="tableRowClassName"
-                            @selection-change="handleSelectionChange">
-                        <el-table-column
-                                type="selection">
-                        </el-table-column>
+                            :row-class-name="tableRowClassName">
                         <el-table-column
                                 type="index">
                         </el-table-column>
                         <el-table-column
-                                prop="name"
+                                prop="stuName"
                                 label="姓名"
                                 align="center">
                         </el-table-column>
                         <el-table-column
                                 prop="score"
-                                label="总分"
+                                label="投档成绩"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="rank"
-                                label="排位"
+                                prop="stuRank"
+                                label="学生排位"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="number"
-                                label="专业代号"
+                                prop="language"
+                                label="外语语种"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="code"
-                                label="专业代码"
+                                prop="professionName"
+                                label="专业名称"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="college"
-                                label="学院"
+                                prop="collegeName"
+                                label="学院名称"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="major"
-                                label="专业"
+                                prop="comment"
+                                label="专业备注"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="record"
-                                label="录取记录"
+                                prop="location"
+                                label="办学地点"
                                 align="center">
                         </el-table-column>
-
                     </el-table>
                 </template>
 
@@ -172,7 +167,7 @@
                 axios({
                     method: "post",
                     url: "http://localhost:8080/car-system/histroy/selectByPageAndCondition?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
-                    data:this.absoluteTable
+                    data: this.absoluteTable
                 }).then((resp) => {
                     // 设置表格数据
                     this.tableData = resp.data.rows;
@@ -234,42 +229,39 @@
                 dialogVisible: false,
                 // 搜索表单数据
                 absoluteTable: {
-                    name:'',
-                    college:'',
-                    majoe:'',
+                    name: '',
+                    college: '',
+                    majoe: '',
                     record: ''
                 },
-                // 复选框数据集合
-                multipleSelection: [],
                 // 表格数据
-                tableData: [{
-                    name: "小黑",
+                admission: [{
+                    stuName: "小黑",
                     score: "599",
-                    rank: "25888",
-                    number: "002",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    //录取记录
-                    record: '已录取'
+                    stuRank: "25888",
+                    language: "英语",
+                    professionName: "日语",
+                    collegeName: '外国语学院',
+                    comment: '',
+                    location: '广州校区'
                 }, {
-                    name: "小黑",
+                    stuName: "小黑",
                     score: "599",
-                    rank: "25888",
-                    number: "002",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    record: '已录取'
+                    stuRank: "25888",
+                    language: "英语",
+                    professionName: "日语",
+                    collegeName: '外国语学院',
+                    comment: '',
+                    location: '广州校区'
                 }, {
-                    name: "小黑",
+                    stuName: "小黑",
                     score: "599",
-                    rank: "25888",
-                    number: "002",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    record: '已录取'
+                    stuRank: "25888",
+                    language: "英语",
+                    professionName: "日语",
+                    collegeName: '外国语学院',
+                    comment: '',
+                    location: '广州校区'
                 }]
             }
         }

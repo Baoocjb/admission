@@ -70,18 +70,14 @@
                 </el-row>
 
                 <!--表格-->
-                <template visibility="hidden" >
+                <template visibility="hidden">
                     <el-table
-                            :data="tableData"
+                            :data="stu"
                             style="width: 100%"
-                            :row-class-name="tableRowClassName"
-                            @selection-change="handleSelectionChange">
-                        <el-table-column
-                                type="selection">
-                        </el-table-column>
+                            :row-class-name="tableRowClassName">
                         <el-table-column
                                 type="index"
-                                >
+                                width="18px">
                         </el-table-column>
                         <el-table-column
                                 prop="name"
@@ -89,59 +85,68 @@
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="rank"
-                                label="排位"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
                                 prop="score"
-                                label="总分"
+                                label="投档成绩"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="no1"
-                                label="志愿1"
+                                prop="ad_one"
+                                label="专业志愿1"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="no2"
-                                label="志愿2"
+                                prop="ad_two"
+                                label="专业志愿2"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="no3"
-                                label="志愿3"
+                                prop="ad_three"
+                                label="专业志愿3"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="no4"
-                                label="志愿4"
+                                prop="ad_four"
+                                label="专业志愿4"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="no5"
-                                label="志愿5"
+                                prop="ad_five"
+                                label="专业志愿5"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="no6"
-                                label="志愿6"
+                                prop="ad_six"
+                                label="专业志愿6"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="tiaoji"
-                                label="调剂"
+                                label="服从调剂"
+                                align="center">
+                            <template slot-scope="scope">
+                                {{ getSwapStr(scope.row.is_swap) }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="stu_rank"
+                                label="学生排位"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="province"
-                                label="省份"
+                                prop="language"
+                                label="外语语种"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                            prop="subject"
-                            label="科类"
-                            align="center">
+                                prop="body_test"
+                                label="体检备注"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                label="录取状态"
+                                align="center">
+                            <template slot-scope="scope">
+                                {{ getStatusStr(scope.row.status) }}
+                            </template>
                         </el-table-column>
 
                         <el-table-column
@@ -190,18 +195,18 @@
         el: "#app",
 
         //生命周期相关方法,页面加载完成后执行的函数
-        mounted(){
-        //    selectall函数
+        mounted() {
+            //    selectall函数
         },
 
         //方法
         methods: {
             //查询所有汽车信息
-            selectAll(){
+            selectAll() {
                 axios({
                     method: "get",
-                    url:"http://localhost:8080/car-system/car/selectByPage?currentPage="+this.currentPage+"&pageSize="+this.pageSize
-                }).then( (resp) => {
+                    url: "http://localhost:8080/car-system/car/selectByPage?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
+                }).then((resp) => {
                     // 设置表格数据
                     this.tableData = resp.data.rows;
                     // 设置总条目数
@@ -233,13 +238,6 @@
                 return '';
             },
 
-            //表格复选框绑定事件
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-
-                console.log(this.multipleSelection)
-            },
-
             //下面是志愿信息上传的方法
             handleRemove(file, fileList) {
                 console.log(file, fileList);
@@ -251,8 +249,30 @@
                 this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
             },
             beforeRemove(file, fileList) {
-                return this.$confirm(`确定移除 ${ file.name }？`);
-            }
+                return this.$confirm(`确定移除 ${file.name}？`);
+            },
+
+            // 调剂状态数值转为字符串
+            getSwapStr(swap) {
+                if (swap == 0) {
+                    return '否'
+                } else {
+                    return '是'
+                }
+            },
+
+            // 录取状态数值转为字符串
+            getStatusStr(status) {
+                if (status == 0) {
+                    return '未录取'
+                } else if (status == 1) {
+                    return '已录取'
+                } else if (status == 2) {
+                    return '退档'
+                } else {
+                    return '调剂录取'
+                }
+            },
         },
 
         //数据
@@ -261,9 +281,9 @@
                 //按钮权限
                 disabled: true,
                 //被选中的cid数组
-                selectedCids:[],
+                selectedCids: [],
                 // 总记录数量
-                totalCount:10,
+                totalCount: 10,
                 // 当前页码
                 currentPage: 1,
                 // 每页记录数
@@ -272,61 +292,67 @@
                 dialogVisible: false,
                 //点击上传功能
                 fileList: [],
-                // 复选框数据集合
-                multipleSelection: [],
                 // 表格数据
-                tableData: [{
+                stu: [{
+                    id: '1',
                     name: "小黑",
-                    rank: "25888",
-                    score: '599',
-                    no1: '计算机类',
-                    no2: '自动化类',
-                    no3: '电气',
-                    no4: '机械类',
-                    no5: '土木类',
-                    no6: '材料类',
-                    tiaoji: '1',
-                    province: '广东',
-                    subject: '理科'
+                    score: "599",
+                    ad_one: '材料类',
+                    ad_two: '计算机类',
+                    ad_three: '自动化类',
+                    ad_four: '电气',
+                    ad_five: '机械类',
+                    ad_six: '土木类',
+                    is_swap: '1',
+                    stu_rank: '25888',
+                    language: '英语',
+                    body_test: '24,25',
+                    status: '0'
                 }, {
+                    id: '2',
                     name: "小黑",
-                    rank: "25888",
-                    score: '599',
-                    no1: '计算机类',
-                    no2: '自动化类',
-                    no3: '电气',
-                    no4: '机械类',
-                    no5: '土木类',
-                    no6: '材料类',
-                    tiaoji: '1',
-                    province: '广东',
-                    subject: '理科'
+                    score: "599",
+                    ad_one: '材料类',
+                    ad_two: '计算机类',
+                    ad_three: '自动化类',
+                    ad_four: '电气',
+                    ad_five: '机械类',
+                    ad_six: '土木类',
+                    is_swap: '0',
+                    stu_rank: '25888',
+                    language: '英语',
+                    body_test: '24,25',
+                    status: '1'
                 }, {
+                    id: '3',
                     name: "小黑",
-                    rank: "25888",
-                    score: '599',
-                    no1: '计算机类',
-                    no2: '自动化类',
-                    no3: '电气',
-                    no4: '机械类',
-                    no5: '土木类',
-                    no6: '材料类',
-                    tiaoji: '1',
-                    province: '广东',
-                    subject: '理科'
+                    score: "599",
+                    ad_one: '材料类',
+                    ad_two: '计算机类',
+                    ad_three: '自动化类',
+                    ad_four: '电气',
+                    ad_five: '机械类',
+                    ad_six: '土木类',
+                    is_swap: '1',
+                    stu_rank: '25888',
+                    language: '英语',
+                    body_test: '24,25',
+                    status: '2'
                 }, {
+                    id: '4',
                     name: "小黑",
-                    rank: "25888",
-                    score: '599',
-                    no1: '计算机类',
-                    no2: '自动化类',
-                    no3: '电气',
-                    no4: '机械类',
-                    no5: '土木类',
-                    no6: '材料类',
-                    tiaoji: '1',
-                    province: '广东',
-                    subject: '理科'
+                    score: "599",
+                    ad_one: '材料类',
+                    ad_two: '计算机类',
+                    ad_three: '自动化类',
+                    ad_four: '电气',
+                    ad_five: '机械类',
+                    ad_six: '土木类',
+                    is_swap: '0',
+                    stu_rank: '25888',
+                    language: '英语',
+                    body_test: '24,25',
+                    status: '3'
                 }]
             }
         }
