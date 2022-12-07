@@ -17,4 +17,11 @@ public interface IAdmissionService extends IService<Admission> {
     Result admission();
 
     Result professionIndex(int currentPage, int pageSize);
+
+    Result collegeIndex(int currentPage, int pageSize);
+
+    Result schoolIndex();
+
+    Result backIndex(int currentPage, int pageSize);
+
 }

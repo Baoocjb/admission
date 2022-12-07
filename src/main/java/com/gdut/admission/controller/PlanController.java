@@ -42,6 +42,7 @@ public class PlanController {
      */
     @GetMapping("index")
     public Result index(int currentPage, int pageSize){
+        // TODO 模糊查询
         return planService.index(currentPage, pageSize);
     }
 
@@ -50,6 +51,7 @@ public class PlanController {
      */
     @PostMapping("update")
     public Result update(@RequestBody Plan plan){
+        // TODO 修改招生计划
         return null;
     }
 
@@ -58,6 +60,7 @@ public class PlanController {
      */
     @PostMapping("delete")
     public Result delete(Integer planId){
+        // TODO 删除招生计划
         return null;
     }
 

@@ -23,6 +23,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>
@@ -105,5 +106,14 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
         }
         removeById(stuId);
         return Result.ok();
+    }
+
+    /**
+     * 返回退档学生信息
+     * @return
+     */
+    @Override
+    public List<Stu> backData() {
+        return list(new LambdaUpdateWrapper<Stu>().eq(Stu::getStatus, 2));
     }
 }

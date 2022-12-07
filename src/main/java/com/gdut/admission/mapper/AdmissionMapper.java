@@ -16,7 +16,11 @@ import java.util.List;
  */
 public interface AdmissionMapper extends BaseMapper<Admission> {
 
-    List<Admission> queryProfessionMaxRank();
+    Admission queryProfessionMaxRank(Integer planId);
 
-    List<Admission> queryProfessionMinRank();
+    Admission queryProfessionMinRank(Integer planId);
+
+    Double queryProfessionAvgScore(Integer planId);
+
+    List<Integer> queryProfessionIdsByCollegeName(String collegeName);
 }

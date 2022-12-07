@@ -6,27 +6,48 @@
     <resultMap id="BaseResultMap" type="com.gdut.admission.entity.Admission">
         <id column="id" property="id"/>
         <result column="stu_id" property="stuId"/>
-        <result column="profession_num" property="professionNum"/>
+        <result column="plan_id" property="planId"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, stu_id, profession_id
+        id, stu_id, plan_id
     </sql>
 
     <select id="queryProfessionMaxRank" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from t_admission
-        group by plan_id
-        order by (select id from t_stu order by stu_rank desc) desc
+        where stu_id = (SELECT id FROM
+        t_stu
+        WHERE id in (SELECT stu_id
+        from t_admission
+        WHERE plan_id = #{planId})
+        ORDER BY stu_rank ASC
+        LIMIT 1)
     </select>
     <select id="queryProfessionMinRank" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from t_admission
-        group by plan_id
-        order by desc(select id from t_stu order by stu_rank asc)
+        where stu_id = (SELECT id FROM
+        t_stu
+        WHERE id in (SELECT stu_id
+        from t_admission
+        WHERE plan_id = #{planId})
+        ORDER BY stu_rank DESC
+        LIMIT 1)
     </select>
-
+    <select id="queryProfessionAvgScore" resultType="double">
+        SELECT AVG(score)
+        from t_stu
+        WHERE id in (SELECT stu_id
+                     from t_admission
+                     WHERE plan_id = #{planId})
+    </select>
+    <select id="queryProfessionIdsByCollegeName" resultType="Integer">
+        select id
+        from t_plan
+        where college_name = #{collegeName}
+    </select>
 </mapper>

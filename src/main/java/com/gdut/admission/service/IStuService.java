@@ -5,6 +5,9 @@ import com.gdut.admission.entity.Stu;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -22,4 +25,6 @@ public interface IStuService extends IService<Stu> {
     Result update(Stu stu);
 
     Result deleteStu(Integer stuId);
+
+    List<Stu> backData();
 }

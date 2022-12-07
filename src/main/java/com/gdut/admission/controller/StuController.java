@@ -49,6 +49,7 @@ public class StuController {
      */
     @GetMapping("index")
     public Result index(int currentPage, int pageSize){
+        // TODO 模糊查询
         return stuService.index(currentPage, pageSize);
     }
 

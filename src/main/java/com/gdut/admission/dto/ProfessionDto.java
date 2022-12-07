@@ -1,11 +1,12 @@
 package com.gdut.admission.dto;
 
+import com.gdut.admission.entity.Plan;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode
-public class ProfessionDto {
+public class ProfessionDto{
     // 专业代号
     private String professionNum;
     // 专业名称
