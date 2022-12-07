@@ -1,7 +1,10 @@
 package com.gdut.admission.mapper;
 
+import com.gdut.admission.dto.AdmissionDto;
 import com.gdut.admission.entity.Admission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface AdmissionMapper extends BaseMapper<Admission> {
 
+    List<Admission> queryProfessionMaxRank();
+
+    List<Admission> queryProfessionMinRank();
 }

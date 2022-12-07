@@ -76,7 +76,6 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
         LambdaUpdateWrapper<Stu> stuLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         stuLambdaUpdateWrapper.orderByDesc(Stu::getScore);
         page(stuPage, stuLambdaUpdateWrapper);
-        stuPage.setPages(currentPage);
         return Result.ok(stuPage);
     }
 

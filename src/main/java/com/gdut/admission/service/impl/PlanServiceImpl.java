@@ -72,7 +72,6 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
         LambdaUpdateWrapper<Plan> stuLambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         stuLambdaUpdateWrapper.orderByAsc(Plan::getProfessionNum);
         page(planPage, stuLambdaUpdateWrapper);
-        planPage.setPages(currentPage);
         return Result.ok(planPage);
     }
 }

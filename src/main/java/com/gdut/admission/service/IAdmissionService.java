@@ -15,4 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IAdmissionService extends IService<Admission> {
 
     Result admission();
+
+    Result professionIndex(int currentPage, int pageSize);
 }

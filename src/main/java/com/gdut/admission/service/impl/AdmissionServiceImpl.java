@@ -4,7 +4,8 @@ import com.alibaba.excel.util.ListUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.gdut.admission.dto.AdmissionDto;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gdut.admission.dto.ProfessionDto;
 import com.gdut.admission.dto.Result;
 import com.gdut.admission.entity.Admission;
 import com.gdut.admission.entity.Plan;
@@ -15,7 +16,6 @@ import com.gdut.admission.service.IAdmissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gdut.admission.service.IPlanService;
 import com.gdut.admission.service.IStuService;
-import com.gdut.admission.util.InsertConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -38,6 +38,8 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     private IStuService stuService;
     @Autowired
     private IPlanService planService;
+    @Autowired
+    private AdmissionMapper admissionMapper;
 
     /**
      * 每隔1000条存储数据库，然后清理list ，方便内存回收
@@ -48,7 +50,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     private List<Admission> admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
 
     // 装载录取学生
-    private List<Stu> admissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<Stu> updateAdmissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
 
     // 装载退档学生
     private List<Stu> backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
@@ -67,6 +69,8 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public Result admission() {
+        // 删除所有的数据再进行导入
+        remove(new QueryWrapper<Admission>());
         // 初始化调剂队列
         swapDeque = new ArrayDeque<>();
 
@@ -98,7 +102,8 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
             Plan plan = planService.getOne(new LambdaUpdateWrapper<Plan>().eq(Plan::getProfessionNum, adOne));
             adSuccess = successAdmission(plan.getId(), stu);
             if (adSuccess) {
-                planId = admissionNormal(plan, stu);
+                plan = planMap.get(plan.getId());
+                planId = normalAdmission(plan, stu);
             }
             // 第二个志愿
             if (!adSuccess) {
@@ -108,10 +113,10 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                     adSuccess = successAdmission(plan.getId(), stu);
                 }else{
                     plan = null;
-                    adSuccess = successAdmission(0, stu);
                 }
                 if (adSuccess) {
-                    planId = admissionNormal(plan, stu);
+                    plan = planMap.get(plan.getId());
+                    planId = normalAdmission(plan, stu);
                 }
             }
             // 第三个志愿
@@ -122,10 +127,10 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                     adSuccess = successAdmission(plan.getId(), stu);
                 }else{
                     plan = null;
-                    adSuccess = successAdmission(0, stu);
                 }
                 if (adSuccess) {
-                    planId = admissionNormal(plan, stu);
+                    plan = planMap.get(plan.getId());
+                    planId = normalAdmission(plan, stu);
                 }
             }
             // 第四个志愿
@@ -136,10 +141,10 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                     adSuccess = successAdmission(plan.getId(), stu);
                 }else{
                     plan = null;
-                    adSuccess = successAdmission(0, stu);
                 }
                 if (adSuccess) {
-                    planId = admissionNormal(plan, stu);
+                    plan = planMap.get(plan.getId());
+                    planId = normalAdmission(plan, stu);
                 }
             }
             // 第五个志愿
@@ -150,10 +155,10 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                     adSuccess = successAdmission(plan.getId(), stu);
                 }else{
                     plan = null;
-                    adSuccess = successAdmission(0, stu);
                 }
                 if (adSuccess) {
-                    planId = admissionNormal(plan, stu);
+                    plan = planMap.get(plan.getId());
+                    planId = normalAdmission(plan, stu);
                 }
             }
             // 第六个志愿
@@ -167,7 +172,8 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                     adSuccess = successAdmission(0, stu);
                 }
                 if (adSuccess) {
-                    planId = admissionNormal(plan, stu);
+                    plan = planMap.get(plan.getId());
+                    planId = normalAdmission(plan, stu);
                 }
             }
             // 所有志愿都不能被录取
@@ -178,36 +184,11 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                     // 此时的学生在队列中成绩由高到低排名
                     swapDeque.offer(stu);
                 } else {
-                    // 加入退档队列, 即把学生状态改为退档
-                    stu.setStatus(2);
-                    backList.add(stu);
-                    if (backList.size() >= BATCH_COUNT) {
-                        // 批量更新
-                        stuService.updateBatchById(backList);
-                        backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-                    }
+                    saveBackStus(stu);
                 }
             } else {
-                // 录取, 将学生插入录取队列中, 以方便批量更新
-                stu.setStatus(1);
-                admissionStus.add(stu);
-                if (admissionStus.size() >= BATCH_COUNT) {
-                    // 批量更新
-                    stuService.updateBatchById(admissionStus);
-                    admissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-                }
-
-                // 将学生插入录取表中
-                Admission admission = new Admission();
-                admission.setPlanId(planId);
-                admission.setStuId(stu.getId());
-                admissionList.add(admission);
-                if (admissionList.size() >= BATCH_COUNT) {
-                    // 批量插入
-                    InsertConsumer.insertData(admissionList, this::saveBatch);
-                    // 存储完成清理 list
-                    admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-                }
+                // 保存录取的学生
+                saveAdmission(1, stu, planId);
             }
             // 移除学生
             iterator.remove();
@@ -230,14 +211,68 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
             }
         };
         sortPlanList.sort(comparator);
+
+        stuService.updateBatchById(updateAdmissionStus);
+        updateAdmissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+
+        stuService.updateBatchById(backList);
+        backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+
+        saveBatch(admissionList);
+        admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
         // 调剂录取
         swapAdmission(sortPlanList, swapDeque);
 
         stuService.updateBatchById(backList);
-        stuService.updateBatchById(admissionStus);
-        InsertConsumer.insertData(admissionList, this::saveBatch);
+        stuService.updateBatchById(updateAdmissionStus);
+        saveBatch(admissionList);
         return Result.ok();
     }
+
+    /**
+     * 保存退档的学生
+     */
+    private void saveBackStus(Stu stu){
+        // 加入退档队列, 即把学生状态改为退档
+        stu.setStatus(2);
+        backList.add(stu);
+        if (backList.size() >= BATCH_COUNT) {
+            // 批量更新
+            stuService.updateBatchById(backList);
+            backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+        }
+    }
+
+    /**
+     * 保存录取的学生
+     * @param status
+     * @param stu
+     * @param planId
+     */
+    private void saveAdmission(Integer status,Stu stu, Integer planId){
+        // 录取, 将学生插入录取队列中, 以方便批量更新
+        stu.setStatus(status);
+        updateAdmissionStus.add(stu);
+        if (updateAdmissionStus.size() >= BATCH_COUNT) {
+            // 批量更新
+            stuService.updateBatchById(updateAdmissionStus);
+            updateAdmissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+        }
+
+        // 将学生插入录取表中
+        Admission admission = new Admission();
+        admission.setPlanId(planId);
+        admission.setStuId(stu.getId());
+        admissionList.add(admission);
+        if (admissionList.size() >= BATCH_COUNT) {
+            // 批量插入
+            saveBatch(admissionList);
+            // 存储完成清理 list
+            admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+        }
+    }
+
+
 
     /**
      * 调剂录取
@@ -256,39 +291,14 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                 if(isSuccess){
                     // 该学生弹出调剂录取队列, 加入录取队列
                     swapDeque.pop();
-                    stu.setStatus(3);
-                    admissionStus.add(stu);
-                    if (admissionStus.size() >= BATCH_COUNT) {
-                        // 批量更新
-                        stuService.updateBatchById(admissionStus);
-                        admissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-                    }
-                    // 将学生插入录取表中
-                    Admission admission = new Admission();
-                    admission.setPlanId(sortPlan.getPlanId());
-                    admission.setStuId(stu.getId());
-                    admissionList.add(admission);
-                    if (admissionList.size() >= BATCH_COUNT) {
-                        // 批量插入
-                        InsertConsumer.insertData(admissionList, this::saveBatch);
-                        // 存储完成清理 list
-                        admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-                    }
+                    saveAdmission(3, stu, sortPlan.getPlanId());
                     swapAdmission(sortPlan.getPlanId());
                     break;
                 }
             }
-
             // 不能被录取, 放入退档队列
             if(!isSuccess){
-                // 加入退档队列, 即把学生状态改为退档
-                stu.setStatus(2);
-                backList.add(stu);
-                if (backList.size() >= BATCH_COUNT) {
-                    // 批量更新
-                    stuService.updateBatchById(backList);
-                    backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-                }
+                saveBackStus(stu);
             }
         }
     }
@@ -302,10 +312,27 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     private void swapAdmission(Integer planId) {
         Plan plan = planMap.get(planId);
         plan.setPlanNum(plan.getPlanNum() - 1);
-        planMap.put(planId, plan);
-        if(plan.getPlanNum() == 0){
+        if(plan.getPlanNum() <= 0){
             planMap.remove(planId);
+            return;
         }
+        planMap.put(planId, plan);
+    }
+
+    /**
+     * 正常录取
+     */
+    private int normalAdmission(Plan plan, Stu stu) {
+        plan.setPlanNum(plan.getPlanNum() - 1);
+        // 记录录取的最后一名考生的总分
+        freePlan.put(plan.getId(), stu.getScore());
+        if (plan.getPlanNum() <= 0) {
+            // 移除招生计划, 剩余的用于调剂
+            planMap.remove(plan.getId());
+            return plan.getId();
+        }
+        planMap.put(plan.getId(), plan);
+        return plan.getId();
     }
 
     /**
@@ -318,7 +345,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     private boolean successAdmission(Integer planId, Stu stu) {
         // 判断招生计划数
         Plan plan = planMap.get(planId);
-        if (plan == null || plan.getPlanNum() == 0) {
+        if (plan == null || plan.getPlanNum() <= 0) {
             return false;
         }
         // 判断是否能被录取
@@ -351,18 +378,43 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         return true;
     }
 
-    /**
-     * 正常录取
-     */
-    private int admissionNormal(Plan plan, Stu stu) {
-        plan.setPlanNum(plan.getPlanNum() - 1);
-        planMap.put(plan.getId(), plan);
-        if (plan.getPlanNum() == 0) {
-            // 移除招生计划, 剩余的用于调剂
-            planMap.remove(plan.getId());
+
+    @Override
+    public Result professionIndex(int currentPage, int pageSize) {
+        // 查询每个专业的最高分, 每个专业的最低分, 每个专业的平均分,
+        Map<Integer , ProfessionDto> professionDtoMap = new HashMap<>();
+        List<Plan> planList = planService.list();
+        // 填充进map
+        for (Plan plan : planList) {
+            ProfessionDto professionDto = new ProfessionDto();
+            professionDto.setProfessionNum(plan.getProfessionNum());
+            professionDto.setProfessionName(plan.getProfessionName());
+            professionDtoMap.put(plan.getId(), professionDto);
         }
-        // 记录录取的最后一名考生的总分
-        freePlan.put(plan.getId(), stu.getScore());
-        return plan.getId();
+        // 填充最高分和最高排位
+        List<Admission> maxRankList = admissionMapper.queryProfessionMaxRank();
+        for (Admission admission : maxRankList) {
+            Stu stu = stuService.getById(admission.getStuId());
+            ProfessionDto professionDto = professionDtoMap.get(admission.getPlanId());
+            professionDto.setMaxScore(stu.getScore());
+            professionDto.setMaxRank(stu.getStuRank());
+            professionDtoMap.put(admission.getPlanId(), professionDto);
+        }
+        // 填充最低分和最低排位
+        List<Admission> minRankList = admissionMapper.queryProfessionMinRank();
+        for (Admission admission : minRankList) {
+            Stu stu = stuService.getById(admission.getStuId());
+            ProfessionDto professionDto = professionDtoMap.get(admission.getPlanId());
+            professionDto.setMinScore(stu.getScore());
+            professionDto.setMinRank(stu.getStuRank());
+            professionDtoMap.put(admission.getPlanId(), professionDto);
+        }
+
+        // 分页
+        Collection<ProfessionDto> records = professionDtoMap.values();
+        List<ProfessionDto> professionDtos = new ArrayList<>(records);
+        Page<ProfessionDto> professionDtoPage = new Page<>(currentPage, pageSize);
+        professionDtoPage.setRecords(professionDtos);
+        return Result.ok();
     }
 }

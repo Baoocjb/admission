@@ -18,4 +18,9 @@ public class AdmissionController {
     public Result admission(){
         return admissionService.admission();
     }
+
+    @GetMapping("profession")
+    public Result professionIndex(int currentPage, int pageSize){
+        return admissionService.professionIndex(currentPage, pageSize);
+    }
 }
