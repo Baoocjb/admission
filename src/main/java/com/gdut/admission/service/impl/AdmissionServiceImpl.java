@@ -49,13 +49,13 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     private static final int BATCH_COUNT = 1000;
 
     // 装载录取数据
-    private List<Admission> admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<Admission> admissionList;
 
     // 装载录取学生
-    private List<Stu> updateAdmissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<Stu> updateAdmissionStus;
 
     // 装载退档学生
-    private List<Stu> backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private List<Stu> backList;
 
     // 调剂队列
     private Deque<Stu> swapDeque;
@@ -71,8 +71,12 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public Result admission() {
+        // 初始化列表
+        admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+        updateAdmissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+        backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
         // 删除所有的数据再进行导入
-        remove(new QueryWrapper<Admission>());
+        this.remove(new QueryWrapper<Admission>());
         // 初始化调剂队列
         swapDeque = new ArrayDeque<>();
 
@@ -428,6 +432,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         Collection<ProfessionDto> records = professionDtoMap.values();
         MyPage<ProfessionDto> professionDtoPage = new MyPage<>(currentPage, pageSize);
         professionDtoPage.setPageRecords(records);
+        professionDtoPage.setTotal(records.size());
         return Result.ok(professionDtoPage);
     }
 

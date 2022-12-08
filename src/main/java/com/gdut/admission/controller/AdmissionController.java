@@ -82,6 +82,11 @@ public class AdmissionController {
         return admissionService.backIndex(currentPage, pageSize);
     }
 
+    /**
+     * 打印退档队列
+     * @param response
+     * @throws IOException
+     */
     @GetMapping("downloadBack")
     public void downloadBack(HttpServletResponse response) throws IOException {
         // 忽略字段

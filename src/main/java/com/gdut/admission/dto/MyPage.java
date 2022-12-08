@@ -35,7 +35,7 @@ public class MyPage<T>{
             iterator.next();
         }
         records = resList;
-        total = records.size();
+        this.total = records.size();
     }
 
     public MyPage(Integer currentPage, Integer pageSize, Integer total) {
