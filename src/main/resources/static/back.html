@@ -51,11 +51,11 @@
 
             <!--中间主题表格-->
             <el-main>
-                <el-button type="success" @click="">导出退档队列</el-button>
+                <el-button type="success" @click="downloadBack">导出退档队列</el-button>
                 <!--表格-->
                 <template>
                     <el-table
-                            :data="tableData"
+                            :data="back"
                             style="width: 100%"
                             :row-class-name="tableRowClassName">
                         </el-table-column>
@@ -69,18 +69,67 @@
                         </el-table-column>
                         <el-table-column
                                 prop="score"
-                                label="总分"
+                                label="投档成绩"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="rank"
-                                label="排位"
+                                prop="adOne"
+                                label="专业志愿1"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="score"
-                                label="录取记录"
+                                prop="adTwo"
+                                label="专业志愿2"
                                 align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adThree"
+                                label="专业志愿3"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adFour"
+                                label="专业志愿4"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adFive"
+                                label="专业志愿5"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adSix"
+                                label="专业志愿6"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                label="服从调剂"
+                                align="center">
+                            <template slot-scope="scope">
+                                {{ getSwapStr(scope.row.is_swap) }}
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="stuRank"
+                                label="学生排位"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="language"
+                                label="外语语种"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="bodyTest"
+                                label="体检备注"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                label="录取状态"
+                                align="center">
+                            <template slot-scope="scope">
+                                {{ getStatusStr(scope.row.status) }}
+                            </template>
                         </el-table-column>
 
                     </el-table>
@@ -124,14 +173,13 @@
 
             selectAll() {
                 axios({
-                    method: "post",
-                    url: "http://localhost:8080/car-system/histroy/selectByPageAndCondition?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
-                    data: this.absoluteTable
+                    method: "get",
+                    url: "http://localhost:8080/admission/back?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
                 }).then((resp) => {
                     // 设置表格数据
-                    this.tableData = resp.data.rows;
+                    this.back = resp.data.data.records;
                     // 设置总条目数
-                    this.totalCount = resp.data.totalCount;
+                    this.totalCount = resp.data.data.total;
                 })
                 console.log(this.uid);
                 console.log(this.tableData[2]);
@@ -171,6 +219,33 @@
                 this.selectAll();
             },
 
+            // 调剂状态数值转为字符串
+            getSwapStr(swap) {
+                if (swap == 0) {
+                    return '否'
+                } else {
+                    return '是'
+                }
+            },
+
+            // 录取状态数值转为字符串
+            getStatusStr(status) {
+                if (status == 0) {
+                    return '未录取'
+                } else if (status == 1) {
+                    return '已录取'
+                } else if (status == 2) {
+                    return '退档'
+                } else {
+                    return '调剂录取'
+                }
+            },
+
+            // 导出退档名单
+            downloadBack(){
+                window.open('http://localhost:8080/admission/downloadBack');
+            },
+
         },
 
         //数据
@@ -189,7 +264,7 @@
                 // 复选框数据集合
                 multipleSelection: [],
                 // 表格数据
-                tableData: [{
+                back: [{
                     name: "小白",
                     score: "399",
                     rank: "88888",

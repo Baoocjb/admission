@@ -86,7 +86,7 @@
                                 type="index">
                         </el-table-column>
                         <el-table-column
-                                prop="stuName"
+                                prop="name"
                                 label="姓名"
                                 align="center">
                         </el-table-column>
@@ -94,6 +94,43 @@
                                 prop="score"
                                 label="投档成绩"
                                 align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adOne"
+                                label="专业志愿1"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adTwo"
+                                label="专业志愿2"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adThree"
+                                label="专业志愿3"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adFour"
+                                label="专业志愿4"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adFive"
+                                label="专业志愿5"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                prop="adSix"
+                                label="专业志愿6"
+                                align="center">
+                        </el-table-column>
+                        <el-table-column
+                                label="服从调剂"
+                                align="center">
+                            <template slot-scope="scope">
+                                {{ getSwapStr(scope.row.is_swap) }}
+                            </template>
                         </el-table-column>
                         <el-table-column
                                 prop="stuRank"
@@ -106,24 +143,16 @@
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="professionName"
-                                label="专业名称"
+                                prop="bodyTest"
+                                label="体检备注"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="collegeName"
-                                label="学院名称"
+                                label="录取状态"
                                 align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="comment"
-                                label="专业备注"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="location"
-                                label="办学地点"
-                                align="center">
+                            <template slot-scope="scope">
+                                {{ getStatusStr(scope.row.status) }}
+                            </template>
                         </el-table-column>
                     </el-table>
                 </template>
@@ -133,7 +162,7 @@
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="currentPage"
-                        :page-sizes="[5, 10, 15, 20]"
+                        :page-sizes="[20, 50, 100, 150]"
                         :page-size="pageSize"
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="totalCount">
@@ -165,17 +194,14 @@
 
             selectAll() {
                 axios({
-                    method: "post",
-                    url: "http://localhost:8080/car-system/histroy/selectByPageAndCondition?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
-                    data: this.absoluteTable
+                    method: "get",
+                    url: "http://localhost:8080/stu/index?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
                 }).then((resp) => {
                     // 设置表格数据
-                    this.tableData = resp.data.rows;
+                    this.admission = resp.data.data.records;
                     // 设置总条目数
-                    this.totalCount = resp.data.totalCount;
+                    this.totalCount = resp.data.data.total;
                 })
-                console.log(this.uid);
-                console.log(this.tableData[2]);
             },
 
             // 分页工具条方法
@@ -212,6 +238,28 @@
                 this.selectAll();
             },
 
+            // 调剂状态数值转为字符串
+            getSwapStr(swap) {
+                if (swap == 0) {
+                    return '否'
+                } else {
+                    return '是'
+                }
+            },
+
+            // 录取状态数值转为字符串
+            getStatusStr(status) {
+                if (status == 0) {
+                    return '未录取'
+                } else if (status == 1) {
+                    return '已录取'
+                } else if (status == 2) {
+                    return '退档'
+                } else {
+                    return '调剂录取'
+                }
+            },
+
         },
 
         //数据
@@ -224,7 +272,7 @@
                 // 当前页码
                 currentPage: 1,
                 // 每页记录数
-                pageSize: 5,
+                pageSize: 20,
                 // 删除功能对话框
                 dialogVisible: false,
                 // 搜索表单数据

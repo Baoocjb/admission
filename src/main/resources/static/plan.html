@@ -54,7 +54,8 @@
                 <el-row>
                     <el-upload
                             class="upload-demo"
-                            action="https://jsonplaceholder.typicode.com/posts/"
+                            name="file"
+                            action="http://localhost:8080/plan/upload"
                             :on-preview="handlePreview"
                             :on-remove="handleRemove"
                             :before-remove="beforeRemove"
@@ -77,7 +78,7 @@
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="professionId"
+                                prop="professionNum"
                                 label="专业代号"
                                 align="center">
                         </el-table-column>
@@ -144,7 +145,7 @@
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="currentPage"
-                        :page-sizes="[5, 10, 15, 200]"
+                        :page-sizes="[5, 10, 15, 20]"
                         :page-size="pageSize"
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="totalCount">
@@ -168,21 +169,21 @@
 
         //生命周期相关方法,页面加载完成后执行的函数
         mounted() {
-
+            this.selectAll();
         },
 
         //方法
         methods: {
-            //查询所有汽车信息
+            //查询招生计划信息
             selectAll() {
                 axios({
                     method: "get",
-                    url: "http://localhost:8080/car-system/car/selectByPage?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
+                    url: "http://localhost:8080/plan/index?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
                 }).then((resp) => {
                     // 设置表格数据
-                    this.tableData = resp.data.rows;
+                    this.plan = resp.data.data.records;
                     // 设置总条目数
-                    this.totalCount = resp.data.totalCount;
+                    this.totalCount = resp.data.data.total;
                 })
             },
 

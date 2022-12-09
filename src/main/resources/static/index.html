@@ -50,12 +50,12 @@
 
             <!--中间主题表格-->
             <el-main>
-
                 <!--导入按钮-->
                 <el-row>
                     <el-upload
                             class="upload-demo"
-                            action="https://jsonplaceholder.typicode.com/posts/"
+                            name="file"
+                            action="http://localhost:8080/stu/upload"
                             :on-preview="handlePreview"
                             :on-remove="handleRemove"
                             :before-remove="beforeRemove"
@@ -66,18 +66,17 @@
                         <el-button size="middle" type="primary">志愿信息导入</el-button>
                     </el-upload>
                     <br>
-                    <el-button type="success" @click="">开始录取</el-button>
+                    <el-button type="success" @click="startAd">开始录取</el-button>
                 </el-row>
 
                 <!--表格-->
-                <template visibility="hidden">
+                <template>
                     <el-table
                             :data="stu"
                             style="width: 100%"
                             :row-class-name="tableRowClassName">
                         <el-table-column
-                                type="index"
-                                width="18px">
+                                type="index">
                         </el-table-column>
                         <el-table-column
                                 prop="name"
@@ -90,32 +89,32 @@
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="ad_one"
+                                prop="adOne"
                                 label="专业志愿1"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="ad_two"
+                                prop="adTwo"
                                 label="专业志愿2"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="ad_three"
+                                prop="adThree"
                                 label="专业志愿3"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="ad_four"
+                                prop="adFour"
                                 label="专业志愿4"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="ad_five"
+                                prop="adFive"
                                 label="专业志愿5"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="ad_six"
+                                prop="adSix"
                                 label="专业志愿6"
                                 align="center">
                         </el-table-column>
@@ -127,7 +126,7 @@
                             </template>
                         </el-table-column>
                         <el-table-column
-                                prop="stu_rank"
+                                prop="stuRank"
                                 label="学生排位"
                                 align="center">
                         </el-table-column>
@@ -137,30 +136,23 @@
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="body_test"
+                                prop="bodyTest"
                                 label="体检备注"
                                 align="center">
-                        </el-table-column>
-                        <el-table-column
-                                label="录取状态"
-                                align="center">
-                            <template slot-scope="scope">
-                                {{ getStatusStr(scope.row.status) }}
-                            </template>
                         </el-table-column>
 
                         <el-table-column
                                 label="修改"
                                 align="center">
                             <el-row>
-                                <el-button type="warning" plain @click="">修改</el-button>
+                                <el-button type="warning" plain @click="handleUpdate(scope.row)">修改</el-button>
                             </el-row>
                         </el-table-column>
                         <el-table-column
                                 label="删除"
                                 align="center">
                             <el-row>
-                                <el-button type="danger" plain @click="">删除</el-button>
+                                <el-button type="danger" plain @click="handleDelete(scope.row)">删除</el-button>
                             </el-row>
                         </el-table-column>
 
@@ -172,7 +164,7 @@
                         @size-change="handleSizeChange"
                         @current-change="handleCurrentChange"
                         :current-page="currentPage"
-                        :page-sizes="[5, 10, 15, 200]"
+                        :page-sizes="[50, 100, 150, 200]"
                         :page-size="pageSize"
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="totalCount">
@@ -196,21 +188,21 @@
 
         //生命周期相关方法,页面加载完成后执行的函数
         mounted() {
-            //    selectall函数
+            this.selectAll();
         },
 
         //方法
         methods: {
-            //查询所有汽车信息
+            //查询所有志愿信息
             selectAll() {
                 axios({
                     method: "get",
-                    url: "http://localhost:8080/car-system/car/selectByPage?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
+                    url: "http://localhost:8080/stu/index?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
                 }).then((resp) => {
-                    // 设置表格数据
-                    this.tableData = resp.data.rows;
-                    // 设置总条目数
-                    this.totalCount = resp.data.totalCount;
+                    // // 设置表格数据
+                    this.stu = resp.data.data.records;
+                    // // 设置总条目数
+                    this.totalCount = resp.data.data.total;
                 })
             },
 
@@ -242,6 +234,7 @@
             handleRemove(file, fileList) {
                 console.log(file, fileList);
             },
+            // 文件上传的方法
             handlePreview(file) {
                 console.log(file);
             },
@@ -273,6 +266,54 @@
                     return '调剂录取'
                 }
             },
+
+            // 开始录取
+            startAd(){
+                axios({
+                    method: "get",
+                    url: "http://localhost:8080/admission/startAd"
+                }).then((resp) => {
+                    if (resp.data.success){
+                        this.$message({
+                            message: '录取工作已完成',
+                            type: 'success'
+                        });
+                    }
+                })
+            },
+
+            //弹出编辑窗口
+            handleUpdate(row) {
+                //回显数据，根据id查询
+                axios.get("/books/" + row.id).then((res) => {
+                    //需判断能否查
+                    if(res.data.code == 20041){
+                        //展示弹层，加载数据
+                        this.formData = res.data.data;
+                        this.dialogFormVisible4Edit = true;
+                    }else{
+                        this.$message.error(res.data.msg);
+                    }
+                });
+            },
+
+            //编辑
+            handleEdit() {
+                //update，传对象，formdata
+                axios.put("/books",this.formData).then((res)=>{
+                    if (res.data.code == 20031) {
+                        this.dialogFormVisible4Edit = false;
+                        this.$message.success("修改成功");
+                    } else if (res.data.code == 20030) {
+                        this.$message.error("修改失败");
+                    } else {
+                        this.$message.error(res.data.msg);
+                    }
+                }).finally(() => {
+                    this.getAll();
+                })
+            },
+
         },
 
         //数据
@@ -287,7 +328,7 @@
                 // 当前页码
                 currentPage: 1,
                 // 每页记录数
-                pageSize: 5,
+                pageSize: 50,
                 // 删除功能对话框
                 dialogVisible: false,
                 //点击上传功能
@@ -297,62 +338,17 @@
                     id: '1',
                     name: "小黑",
                     score: "599",
-                    ad_one: '材料类',
-                    ad_two: '计算机类',
-                    ad_three: '自动化类',
-                    ad_four: '电气',
-                    ad_five: '机械类',
-                    ad_six: '土木类',
-                    is_swap: '1',
-                    stu_rank: '25888',
+                    adOne: '材料类',
+                    adTwo: '计算机类',
+                    adThree: '自动化类',
+                    adFour: '电气',
+                    adFive: '机械类',
+                    adSix: '土木类',
+                    isSwap: '1',
+                    stuRank: '25888',
                     language: '英语',
-                    body_test: '24,25',
+                    bodyTest: '24,25',
                     status: '0'
-                }, {
-                    id: '2',
-                    name: "小黑",
-                    score: "599",
-                    ad_one: '材料类',
-                    ad_two: '计算机类',
-                    ad_three: '自动化类',
-                    ad_four: '电气',
-                    ad_five: '机械类',
-                    ad_six: '土木类',
-                    is_swap: '0',
-                    stu_rank: '25888',
-                    language: '英语',
-                    body_test: '24,25',
-                    status: '1'
-                }, {
-                    id: '3',
-                    name: "小黑",
-                    score: "599",
-                    ad_one: '材料类',
-                    ad_two: '计算机类',
-                    ad_three: '自动化类',
-                    ad_four: '电气',
-                    ad_five: '机械类',
-                    ad_six: '土木类',
-                    is_swap: '1',
-                    stu_rank: '25888',
-                    language: '英语',
-                    body_test: '24,25',
-                    status: '2'
-                }, {
-                    id: '4',
-                    name: "小黑",
-                    score: "599",
-                    ad_one: '材料类',
-                    ad_two: '计算机类',
-                    ad_three: '自动化类',
-                    ad_four: '电气',
-                    ad_five: '机械类',
-                    ad_six: '土木类',
-                    is_swap: '0',
-                    stu_rank: '25888',
-                    language: '英语',
-                    body_test: '24,25',
-                    status: '3'
                 }]
             }
         }
