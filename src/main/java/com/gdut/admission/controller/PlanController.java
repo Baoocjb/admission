@@ -64,5 +64,17 @@ public class PlanController {
         return null;
     }
 
-
+    /**
+     * 根据招生计划id查询招生计划
+     * @param id
+     * @return
+     */
+    @GetMapping("getOne")
+    public Result getPlanById(Integer id) {
+        Plan plan = planService.getById(id);
+        if (id == null || plan == null) {
+            return Result.fail("待查询招生计划不存在!");
+        }
+        return Result.ok(plan);
+    }
 }

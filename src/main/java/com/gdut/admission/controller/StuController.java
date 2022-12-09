@@ -21,7 +21,7 @@ import java.io.IOException;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author Bao
@@ -37,18 +37,19 @@ public class StuController {
      * 志愿文件上传
      */
     @PostMapping("upload")
-    public Result upload(@RequestBody MultipartFile file){
+    public Result upload(@RequestBody MultipartFile file) {
         return stuService.upload(file);
     }
 
     /**
      * 分页显示志愿信息,并按照分数排序
+     *
      * @param currentPage
      * @param pageSize
      * @return
      */
     @GetMapping("index")
-    public Result index(int currentPage, int pageSize){
+    public Result index(int currentPage, int pageSize) {
         // TODO 模糊查询
         return stuService.index(currentPage, pageSize);
     }
@@ -57,7 +58,7 @@ public class StuController {
      * 修改学生志愿信息
      */
     @PostMapping("update")
-    public Result update(@RequestBody Stu stu){
+    public Result update(@RequestBody Stu stu) {
         return stuService.update(stu);
     }
 
@@ -65,7 +66,21 @@ public class StuController {
      * 删除学生志愿信息
      */
     @PostMapping("delete")
-    public Result delete(Integer stuId){
+    public Result delete(Integer stuId) {
         return stuService.deleteStu(stuId);
+    }
+
+    /**
+     * 根据学生id查询学生
+     * @param id
+     * @return
+     */
+    @GetMapping("getOne")
+    public Result getStuById(Integer id) {
+        Stu stu = stuService.getById(id);
+        if (id == null || stu == null) {
+            return Result.fail("待查询学生不存在!");
+        }
+        return Result.ok(stu);
     }
 }
