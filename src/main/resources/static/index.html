@@ -27,7 +27,7 @@
                     <template slot="title"><i class="el-icon-setting"></i>录取记录类</template>
                     <el-menu-item-group>
                         <el-menu-item index="2-1">
-                            <a href="admission.html">拟录取表</a>
+                            <a href="admission.html">录取情况</a>
                         </el-menu-item>
                         <el-menu-item index="2-2">
                             <a href="data.html">统计数据</a>
@@ -144,7 +144,7 @@
                         <el-table-column
                                 label="修改"
                                 align="center">
-                            <el-row>
+                            <el-row slot-scope="scope">
                                 <el-button type="warning" plain @click="handleUpdate(scope.row)">修改</el-button>
                             </el-row>
                         </el-table-column>
@@ -169,6 +169,80 @@
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="totalCount">
                 </el-pagination>
+
+
+                <div class="add-form">
+                    <el-dialog title="修改学生志愿" :visible.sync="dialogFormVisible4Edit">
+                        <el-form ref="dataEditForm" :model="formData" :rules="rules" label-position="right"
+                                 label-width="100px">
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="姓名" prop="name">
+                                        <el-input v-model="formData.name"  readonly="readonly"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="投档成绩" prop="score">
+                                        <el-input v-model="formData.score" readonly="readonly"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="学生排位" prop="stuRank">
+                                        <el-input v-model="formData.stuRank" readonly="readonly"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="服从调剂">
+                                        <el-input v-model="formData.isSwap"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="专业志愿1" prop="adOne">
+                                        <el-input v-model="formData.adOne"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="专业志愿2"  prop="adTwo">
+                                        <el-input v-model="formData.adTwo"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="专业志愿3" prop="adThree">
+                                        <el-input v-model="formData.adThree"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="专业志愿4"  prop="adFour">
+                                        <el-input v-model="formData.adFour"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="专业志愿5" prop="adFive">
+                                        <el-input v-model="formData.adFive"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="专业志愿6"  prop="adSix">
+                                        <el-input v-model="formData.adSix"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="dialogFormVisible4Edit = false">取消</el-button>
+                            <el-button type="primary" @click="handleEdit()">确定</el-button>
+                        </div>
+                    </el-dialog>
+                </div>
+
 
             </el-main>
         </el-container>
@@ -284,33 +358,35 @@
 
             //弹出编辑窗口
             handleUpdate(row) {
-                //回显数据，根据id查询
-                axios.get("/books/" + row.id).then((res) => {
-                    //需判断能否查
-                    if(res.data.code == 20041){
-                        //展示弹层，加载数据
-                        this.formData = res.data.data;
+                axios({
+                    method: "get",
+                    url: "http://localhost:8080/stu/getOne?id=" + row.id
+                }).then((resp) => {
+                    // 查到了学生信息
+                    if (resp.data.success){
+                        this.formData = resp.data.data;
                         this.dialogFormVisible4Edit = true;
-                    }else{
-                        this.$message.error(res.data.msg);
+                    } else{
+                        this.$message.error(resp.data.errorMsg);
                     }
-                });
+                })
             },
 
             //编辑
             handleEdit() {
                 //update，传对象，formdata
-                axios.put("/books",this.formData).then((res)=>{
-                    if (res.data.code == 20031) {
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/stu/update",
+                    data: this.formData
+                }).then((resp) => {
+                    if (resp.data.success) {
                         this.dialogFormVisible4Edit = false;
                         this.$message.success("修改成功");
-                    } else if (res.data.code == 20030) {
-                        this.$message.error("修改失败");
                     } else {
-                        this.$message.error(res.data.msg);
+                        this.$message.error(res.data.errorMsg);
                     }
-                }).finally(() => {
-                    this.getAll();
+                    this.selectAll();
                 })
             },
 
@@ -349,7 +425,13 @@
                     language: '英语',
                     bodyTest: '24,25',
                     status: '0'
-                }]
+                }],
+                formData: {},//表单数据
+                dialogFormVisible: false,//控制表单是否可见
+                dialogFormVisible4Edit: false,//编辑表单是否可见
+                rules: {//校验规则
+                    adOne: [{required: true, message: '专业志愿1为必填项', trigger: 'blur'}]
+                }
             }
         }
     })
