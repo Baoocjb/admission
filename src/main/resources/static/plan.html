@@ -126,15 +126,15 @@
                         <el-table-column
                                 label="修改"
                                 align="center">
-                            <el-row>
-                                <el-button type="warning" plain @click="">修改</el-button>
+                            <el-row slot-scope="scope">
+                                <el-button type="warning" plain @click="handleUpdate(scope.row)">修改</el-button>
                             </el-row>
                         </el-table-column>
                         <el-table-column
                                 label="删除"
                                 align="center">
-                            <el-row>
-                                <el-button type="danger" plain @click="">删除</el-button>
+                            <el-row slot-scope="scope">
+                                <el-button type="danger" plain @click="handleDelete(scope.row)">删除</el-button>
                             </el-row>
                         </el-table-column>
                     </el-table>
@@ -150,6 +150,78 @@
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="totalCount">
                 </el-pagination>
+
+                <div class="add-form">
+                    <el-dialog title="修改招生计划" :visible.sync="dialogFormVisible4Edit">
+                        <el-form ref="dataEditForm" :model="formData" :rules="rules" label-position="right"
+                                 label-width="100px">
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="专业组号" prop="groupId">
+                                        <el-input v-model="formData.groupId"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="专业代号" prop="professionId">
+                                        <el-input v-model="formData.professionId"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="专业名称" prop="professionName">
+                                        <el-input v-model="formData.professionName"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="学院名称" prop="collegeName">
+                                        <el-input v-model="formData.collegeName"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="招生计划数" prop="planNum">
+                                        <el-input v-model="formData.planNum"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="专业备注"  prop="comment">
+                                        <el-input v-model="formData.comment"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="办学地点" prop="location">
+                                        <el-input v-model="formData.location"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="外语语种"  prop="language">
+                                        <el-input v-model="formData.language"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="体检受限1" prop="testLimit1">
+                                        <el-input v-model="formData.testLimit1"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="体检受限2"  prop="testLimit2">
+                                        <el-input v-model="formData.testLimit2"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="dialogFormVisible4Edit = false">取消</el-button>
+                            <el-button type="primary" @click="handleEdit()">确定</el-button>
+                        </div>
+                    </el-dialog>
+                </div>
 
             </el-main>
         </el-container>
@@ -230,7 +302,68 @@
             },
             beforeRemove(file, fileList) {
                 return this.$confirm(`确定移除 ${file.name}？`);
+            },
+
+            //弹出编辑窗口
+            handleUpdate(row) {
+                axios({
+                    method: "get",
+                    url: "http://localhost:8080/plan/getOne?id=" + row.id
+                }).then((resp) => {
+                    // 查到了学生信息
+                    if (resp.data.success){
+                        this.formData = resp.data.data;
+                        this.dialogFormVisible4Edit = true;
+                    } else{
+                        this.$message.error(resp.data.errorMsg);
+                    }
+                })
+            },
+
+            //编辑
+            handleEdit() {
+                console.log(this.formData);
+                //update，传对象，formdata
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/plan/update",
+                    data: this.formData
+                }).then((resp) => {
+                    if (resp.data.success) {
+                        this.dialogFormVisible4Edit = false;
+                        this.$message.success("修改成功");
+                    } else {
+                        this.$message.error(res.data.errorMsg);
+                    }
+                }).finally(()=>{
+                    this.selectAll();
+                });
+            },
+
+            // 删除
+            handleDelete(row) {
+                //1.弹出提示框
+                this.$confirm("此操作永久删除当前数据，是否继续？","提示",{
+                    type:'info'
+                }).then(()=>{
+                    axios({
+                        method: "post",
+                        url: "http://localhost:8080/plan/delete?planId=" + row.id,
+                    }).then((resp) => {
+                        if (resp.data.success) {
+                            this.dialogFormVisible4Edit = false;
+                            this.$message.success("删除成功");
+                        } else {
+                            this.$message.error(resp.data.errorMsg);
+                        }
+                        this.selectAll();
+                    })
+                }).catch(()=>{
+                    //3.取消删除
+                    this.$message.info("取消删除操作");
+                });
             }
+
         },
 
         //数据
@@ -263,43 +396,18 @@
                     language: '英语',
                     testLimit1: '',
                     testLimit2: '',
-                }, {
-                    id: '2',
-                    groupId: "201",
-                    professionId: "002",
-                    professionName: '日语',
-                    collegeName: '外国语学院',
-                    planNum: '30',
-                    comment: '',
-                    location: '广州地区',
-                    language: '英语',
-                    testLimit1: '',
-                    testLimit2: '',
-                }, {
-                    id: '3',
-                    groupId: "203",
-                    professionId: "001",
-                    professionName: '工商管理类',
-                    collegeName: '管理学院',
-                    planNum: '87',
-                    comment: '',
-                    location: '河源地区',
-                    language: '',
-                    testLimit1: '21',
-                    testLimit2: '',
-                }, {
-                    id: '4',
-                    groupId: "204",
-                    professionId: "001",
-                    professionName: '电子商务',
-                    collegeName: '管理学院',
-                    planNum: '50',
-                    comment: '',
-                    location: '河源地区',
-                    language: '',
-                    testLimit1: '',
-                    testLimit2: '23',
-                }]
+                }],
+                formData: {},//表单数据
+                dialogFormVisible: false,//控制表单是否可见
+                dialogFormVisible4Edit: false,//编辑表单是否可见
+                rules: {//校验规则
+                    groupId: [{required: true, message: '专业组号为必填项', trigger: 'blur'}]
+                    professionId: [{required: true, message: '专业代号为必填项', trigger: 'blur'}]
+                    professionName: [{required: true, message: '专业名称为必填项', trigger: 'blur'}]
+                    collegeName: [{required: true, message: '学院名称为必填项', trigger: 'blur'}]
+                    planNum: [{required: true, message: '招生计划数为必填项', trigger: 'blur'}]
+                    location: [{required: true, message: '办学地点为必填项', trigger: 'blur'}]
+                }
             }
         }
     })
