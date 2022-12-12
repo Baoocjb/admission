@@ -22,7 +22,7 @@ public interface IStuService extends IService<Stu> {
 
     Result index(int currentPage, int pageSize);
 
-    Result update(Stu stu);
+    Result updateStu(Stu stu);
 
     Result deleteStu(Integer stuId);
 

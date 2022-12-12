@@ -23,7 +23,7 @@ import java.io.IOException;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author Bao
@@ -34,12 +34,13 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
 
     /**
      * 招生计划信息导入至数据库中
+     *
      * @param file
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public Result upload(MultipartFile file) {
-        if(file == null || file.isEmpty()){
+        if (file == null || file.isEmpty()) {
             return Result.fail("文件不能为空!");
         }
         // 删除所有的数据再进行导入
@@ -63,6 +64,7 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
 
     /**
      * 将招生计划分页展示
+     *
      * @param currentPage
      * @param pageSize
      * @return
@@ -73,5 +75,31 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
         stuLambdaUpdateWrapper.orderByAsc(Plan::getProfessionNum);
         page(planPage, stuLambdaUpdateWrapper);
         return Result.ok(planPage);
+    }
+
+    @Override
+    public Result updatePlan(Plan plan) {
+        if (plan == null
+                || plan.getId() == null
+                || plan.getGroupId() == null
+                || plan.getProfessionNum() == null
+                || plan.getProfessionName() == null
+                || plan.getCollegeName() == null
+                || plan.getPlanNum() == null
+                || plan.getLocation() == null
+        ) {
+            return Result.fail("参数不能为空!");
+        }
+        updateById(plan);
+        return Result.ok();
+    }
+
+    @Override
+    public Result deletePlan(Integer planId) {
+        if (planId == null || getById(planId) == null){
+            return Result.fail("待删除记录不存在!");
+        }
+        removeById(planId);
+        return Result.ok();
     }
 }

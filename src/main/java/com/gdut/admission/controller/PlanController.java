@@ -51,17 +51,17 @@ public class PlanController {
      */
     @PostMapping("update")
     public Result update(@RequestBody Plan plan){
-        // TODO 修改招生计划
-        return null;
+        // 修改招生计划
+        return planService.updatePlan(plan);
     }
 
     /**
      * 删除招生计划
      */
     @PostMapping("delete")
-    public Result delete(Integer planId){
-        // TODO 删除招生计划
-        return null;
+    public Result deletePlan(Integer planId){
+        // 删除招生计划
+        return planService.deletePlan(planId);
     }
 
     /**

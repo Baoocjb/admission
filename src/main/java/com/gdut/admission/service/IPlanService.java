@@ -18,4 +18,8 @@ public interface IPlanService extends IService<Plan> {
     Result upload(MultipartFile file);
 
     Result index(int currentPage, int pageSize);
+
+    Result updatePlan(Plan plan);
+
+    Result deletePlan(Integer planId);
 }

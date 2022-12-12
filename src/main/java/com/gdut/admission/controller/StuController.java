@@ -58,8 +58,8 @@ public class StuController {
      * 修改学生志愿信息
      */
     @PostMapping("update")
-    public Result update(@RequestBody Stu stu) {
-        return stuService.update(stu);
+    public Result updateStu(@RequestBody Stu stu) {
+        return stuService.updateStu(stu);
     }
 
     /**

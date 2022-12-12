@@ -27,7 +27,7 @@ import java.util.List;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author Bao
@@ -39,12 +39,13 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
 
     /**
      * 导入学生志愿信息至数据库中
+     *
      * @param file
      * @return
      */
     @Transactional(propagation = Propagation.REQUIRED)
     public Result upload(MultipartFile file) {
-        if(file == null || file.isEmpty()){
+        if (file == null || file.isEmpty()) {
             return Result.fail("文件不能为空!");
         }
         // 删除所有的数据再进行导入
@@ -68,6 +69,7 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
 
     /**
      * 显示所有学生志愿信息,并按照分数排序
+     *
      * @param currentPage
      * @param pageSize
      * @return
@@ -81,27 +83,29 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
     }
 
     @Override
-    public Result update(Stu stu) {
-        if(stu.getName() == null
+    public Result updateStu(Stu stu) {
+
+        if (stu == null
+                || stu.getName() == null
                 || stu.getScore() == null
                 || stu.getAdOne() == null
                 || stu.getLanguage() == null
                 || stu.getIsSwap() == null
                 || stu.getStuRank() == null
                 || stu.getId() == null
-        ){
+        ) {
             return Result.fail("参数不能为空!");
         }
-        if(getById(stu.getId()) == null){
+        if (getById(stu.getId()) == null) {
             return Result.fail("待删除记录不存在");
         }
-        this.update(stu);
+        this.updateById(stu);
         return Result.ok();
     }
 
     @Override
     public Result deleteStu(Integer stuId) {
-        if(stuId == null || getById(stuId) == null){
+        if (stuId == null || getById(stuId) == null) {
             return Result.fail("待删除记录不存在!");
         }
         removeById(stuId);
@@ -110,6 +114,7 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
 
     /**
      * 返回退档学生信息
+     *
      * @return
      */
     @Override
