@@ -17,7 +17,6 @@ public class MyPage<T>{
 
         // 手动分页
         int total = collection.size();
-        if(currentPage == 0)currentPage = 1;
         // 起始下标
         int start = (currentPage - 1) * pageSize + 1;
         int i = 1;
