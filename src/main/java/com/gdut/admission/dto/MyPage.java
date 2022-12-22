@@ -2,10 +2,7 @@ package com.gdut.admission.dto;
 
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Data
 public class MyPage<T>{
@@ -17,6 +14,7 @@ public class MyPage<T>{
     // 手动分页
     public void setPageRecords(Collection<T> collection){
         List<T> resList = new ArrayList<>();
+
         // 手动分页
         int total = collection.size();
         if(currentPage == 0)currentPage = 1;

@@ -1,7 +1,6 @@
 package com.gdut.admission.service.impl;
 
 import com.alibaba.excel.util.ListUtils;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -16,8 +15,6 @@ import com.gdut.admission.service.IAdmissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gdut.admission.service.IPlanService;
 import com.gdut.admission.service.IStuService;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -298,7 +295,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                     // 该学生弹出调剂录取队列, 加入录取队列
                     swapDeque.pop();
                     saveAdmission(3, stu, sortPlan.getPlanId());
-                    swapAdmission(sortPlan.getPlanId());
+                    updatePlanNums(sortPlan.getPlanId());
                     break;
                 }
             }
@@ -310,12 +307,12 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     }
 
     /**
-     * 调剂录取
+     * 调剂录取,更新计划数
      *
      * @param planId
      * @return
      */
-    private void swapAdmission(Integer planId) {
+    private void updatePlanNums(Integer planId) {
         Plan plan = planMap.get(planId);
         plan.setPlanNum(plan.getPlanNum() - 1);
         if (plan.getPlanNum() <= 0) {
