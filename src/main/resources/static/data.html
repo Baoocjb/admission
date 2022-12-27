@@ -51,88 +51,10 @@
 
             <!--中间主题表格-->
             <el-main>
-                <!--搜索表单-->
-                <el-form :inline="true" :model="absoluteTable" class="demo-form-inline">
 
-                    <el-form-item label="学院">
-                        <el-input v-model="absoluteTable.college" placeholder="学院"></el-input>
-                    </el-form-item>
+                <div id="chart" style="width: 800px;height: 600px">
 
-                    <el-form-item>
-                        <el-button type="primary" @click="">查询</el-button>
-                        <el-button type="primary" @click="">前1%</el-button>
-                        <el-button type="success" @click="">导出前1%</el-button>
-                    </el-form-item>
-                </el-form>
-
-                <!--表格-->
-                <template>
-                    <el-table
-                            :data="tableData"
-                            style="width: 100%"
-                            :row-class-name="tableRowClassName"
-                            @selection-change="handleSelectionChange">
-                        <el-table-column
-                                type="selection">
-                        </el-table-column>
-                        <el-table-column
-                                type="index">
-                        </el-table-column>
-                        <el-table-column
-                                prop="professionNum"
-                                label="专业代号"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="score"
-                                label="总分"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="rank"
-                                label="排位"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="number"
-                                label="专业代号"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="code"
-                                label="专业代码"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="college"
-                                label="学院"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="major"
-                                label="专业"
-                                align="center">
-                        </el-table-column>
-                        <el-table-column
-                                prop="record"
-                                label="录取记录"
-                                align="center">
-                        </el-table-column>
-
-                    </el-table>
-                </template>
-
-                <!--分页工具条-->
-                <el-pagination
-                        @size-change="handleSizeChange"
-                        @current-change="handleCurrentChange"
-                        :current-page="currentPage"
-                        :page-sizes="[5, 10, 15, 20]"
-                        :page-size="pageSize"
-                        layout="total, sizes, prev, pager, next, jumper"
-                        :total="totalCount">
-                </el-pagination>
-
+                </div>
             </el-main>
         </el-container>
     </el-container>
@@ -144,6 +66,8 @@
 <link rel="stylesheet" href="element-ui/lib/theme-chalk/index.css">
 <link rel="stylesheet" href="css/admission.css">
 <script src="js/axios-0.18.0.js"></script>
+<script src="js/echarts.js"></script>
+
 
 <script>
     new Vue({
@@ -277,5 +201,6 @@
         }
     })
 </script>
+<script src="js/data.js"></script>
 </body>
 </html>
