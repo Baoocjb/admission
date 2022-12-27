@@ -1,5 +1,6 @@
 package com.gdut.admission.service;
 
+import com.gdut.admission.dto.AdmissionStuDto;
 import com.gdut.admission.dto.Result;
 import com.gdut.admission.entity.Stu;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -27,4 +28,6 @@ public interface IStuService extends IService<Stu> {
     Result deleteStu(Integer stuId);
 
     List<Stu> backData();
+
+    List<AdmissionStuDto> getAdStuByParams(AdmissionStuDto admissionStuDto);
 }

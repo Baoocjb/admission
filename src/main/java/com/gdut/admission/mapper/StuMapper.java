@@ -1,7 +1,10 @@
 package com.gdut.admission.mapper;
 
+import com.gdut.admission.dto.AdmissionStuDto;
 import com.gdut.admission.entity.Stu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface StuMapper extends BaseMapper<Stu> {
 
+    List<Stu> getStuByParams(AdmissionStuDto admissionStuDto);
 }

@@ -3,12 +3,14 @@ package com.gdut.admission.controller;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.util.MapUtils;
 import com.alibaba.fastjson.JSON;
+import com.gdut.admission.dto.AdmissionStuDto;
 import com.gdut.admission.dto.Result;
 import com.gdut.admission.entity.Stu;
 import com.gdut.admission.service.IAdmissionService;
 import com.gdut.admission.service.IStuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -80,6 +82,16 @@ public class AdmissionController {
     @GetMapping("back")
     public Result backIndex(int currentPage, int pageSize) {
         return admissionService.backIndex(currentPage, pageSize);
+    }
+
+    /**
+     * 模糊查询录取结果学生信息
+     *
+     * @return
+     */
+    @GetMapping("queryResult")
+    public Result getStuAdmissionByParams(@RequestBody(required = false)AdmissionStuDto admissionStuDto, int currentPage, int pageSize) {
+        return admissionService.getStuAdmissionByParams(admissionStuDto, currentPage, pageSize);
     }
 
     /**

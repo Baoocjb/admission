@@ -1,5 +1,7 @@
 package com.gdut.admission.service;
 
+import com.gdut.admission.dto.AdmissionStuDto;
+import com.gdut.admission.query.AdmissionStusQuery;
 import com.gdut.admission.dto.Result;
 import com.gdut.admission.entity.Admission;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -24,4 +26,5 @@ public interface IAdmissionService extends IService<Admission> {
 
     Result backIndex(int currentPage, int pageSize);
 
+    Result getStuAdmissionByParams(AdmissionStuDto admissionStuDto, int currentPage, int pageSize);
 }
