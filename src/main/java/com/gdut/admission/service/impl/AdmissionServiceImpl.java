@@ -1,7 +1,6 @@
 package com.gdut.admission.service.impl;
 
 import com.alibaba.excel.util.ListUtils;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -16,8 +15,6 @@ import com.gdut.admission.service.IAdmissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gdut.admission.service.IPlanService;
 import com.gdut.admission.service.IStuService;
-import org.apache.poi.ss.formula.functions.T;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -44,18 +41,15 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     private AdmissionMapper admissionMapper;
 
     /**
-     * 每隔1000条存储数据库，然后清理list ，方便内存回收
+     * 每隔3000条存储数据库，然后清理list ，方便内存回收
      */
-    private static final int BATCH_COUNT = 1000;
+    private static final int BATCH_COUNT = 3000;
 
     // 装载录取数据
     private List<Admission> admissionList;
 
     // 装载录取学生
-    private List<Stu> updateAdmissionStus;
-
-    // 装载退档学生
-    private List<Stu> backList;
+    private List<Stu> admittedStusList;
 
     // 调剂队列
     private Deque<Stu> swapDeque;
@@ -73,18 +67,16 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     public Result admission() {
         // 初始化列表
         admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-        updateAdmissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-        backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+        admittedStusList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
         // 删除所有的数据再进行导入
         this.remove(new QueryWrapper<Admission>());
         // 初始化调剂队列
         swapDeque = new ArrayDeque<>();
 
-        LambdaQueryWrapper<Stu> stuQueryWrapper = new LambdaQueryWrapper<>();
         // 查询所有考生并按照排名排序
+        LambdaQueryWrapper<Stu> stuQueryWrapper = new LambdaQueryWrapper<>();
         stuQueryWrapper.orderByAsc(Stu::getStuRank);
         List<Stu> stuList = stuService.list(stuQueryWrapper);
-        Iterator<Stu> iterator = stuList.iterator();
 
         // 获取招生计划表, 并放入Map记录
         List<Plan> planList = planService.list();
@@ -97,6 +89,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         }
 
         // 遍历所有学生
+        Iterator<Stu> iterator = stuList.iterator();
         while (iterator.hasNext()) {
             Stu stu = iterator.next();
             // 录取结果
@@ -104,84 +97,43 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
             int planId = -1;
             // 遍历该学生志愿信息
             // 第一个志愿
-            String adOne = stu.getAdOne();
-            Plan plan = planService.getOne(new LambdaUpdateWrapper<Plan>().eq(Plan::getProfessionNum, adOne));
-            adSuccess = successAdmission(plan.getId(), stu);
-            if (adSuccess) {
-                plan = planMap.get(plan.getId());
-                planId = normalAdmission(plan, stu);
+            if (!adSuccess) {
+                String adOne = stu.getAdOne();
+                planId = tryAdmissionAndUpdateAdStatus(adOne, stu);
+                adSuccess = planId == -1 ? false : true;
             }
             // 第二个志愿
             if (!adSuccess) {
                 String adTwo = stu.getAdTwo();
-                if (adTwo != null) {
-                    plan = planService.getOne(new LambdaUpdateWrapper<Plan>().eq(Plan::getProfessionNum, adTwo));
-                    adSuccess = successAdmission(plan.getId(), stu);
-                } else {
-                    plan = null;
-                }
-                if (adSuccess) {
-                    plan = planMap.get(plan.getId());
-                    planId = normalAdmission(plan, stu);
-                }
+                planId = tryAdmissionAndUpdateAdStatus(adTwo, stu);
+                adSuccess = planId == -1 ? false : true;
             }
             // 第三个志愿
             if (!adSuccess) {
                 String adThree = stu.getAdThree();
-                if (adThree != null) {
-                    plan = planService.getOne(new LambdaUpdateWrapper<Plan>().eq(Plan::getProfessionNum, adThree));
-                    adSuccess = successAdmission(plan.getId(), stu);
-                } else {
-                    plan = null;
-                }
-                if (adSuccess) {
-                    plan = planMap.get(plan.getId());
-                    planId = normalAdmission(plan, stu);
-                }
+                planId = tryAdmissionAndUpdateAdStatus(adThree, stu);
+                adSuccess = planId == -1 ? false : true;
             }
             // 第四个志愿
             if (!adSuccess) {
                 String adFour = stu.getAdFour();
-                if (adFour != null) {
-                    plan = planService.getOne(new LambdaUpdateWrapper<Plan>().eq(Plan::getProfessionNum, adFour));
-                    adSuccess = successAdmission(plan.getId(), stu);
-                } else {
-                    plan = null;
-                }
-                if (adSuccess) {
-                    plan = planMap.get(plan.getId());
-                    planId = normalAdmission(plan, stu);
-                }
+                planId = tryAdmissionAndUpdateAdStatus(adFour, stu);
+                adSuccess = planId == -1 ? false : true;
             }
             // 第五个志愿
             if (!adSuccess) {
                 String adFive = stu.getAdFive();
-                if (adFive != null) {
-                    plan = planService.getOne(new LambdaUpdateWrapper<Plan>().eq(Plan::getProfessionNum, adFive));
-                    adSuccess = successAdmission(plan.getId(), stu);
-                } else {
-                    plan = null;
-                }
-                if (adSuccess) {
-                    plan = planMap.get(plan.getId());
-                    planId = normalAdmission(plan, stu);
-                }
+                planId = tryAdmissionAndUpdateAdStatus(adFive, stu);
+                adSuccess = planId == -1 ? false : true;
             }
+
             // 第六个志愿
             if (!adSuccess) {
                 String adSix = stu.getAdSix();
-                if (adSix != null) {
-                    plan = planService.getOne(new LambdaUpdateWrapper<Plan>().eq(Plan::getProfessionNum, adSix));
-                    adSuccess = successAdmission(plan.getId(), stu);
-                } else {
-                    plan = null;
-                    adSuccess = successAdmission(0, stu);
-                }
-                if (adSuccess) {
-                    plan = planMap.get(plan.getId());
-                    planId = normalAdmission(plan, stu);
-                }
+                planId = tryAdmissionAndUpdateAdStatus(adSix, stu);
+                adSuccess = planId == -1 ? false : true;
             }
+
             // 所有志愿都不能被录取
             if (!adSuccess) {
                 // 查看该学生是否允许调剂
@@ -190,11 +142,13 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
                     // 此时的学生在队列中成绩由高到低排名
                     swapDeque.offer(stu);
                 } else {
-                    saveBackStus(stu);
+                    // 更新录取状态
+                    updateAdmissionStatus(2, stu);
                 }
             } else {
-                // 保存录取的学生
-                saveAdmission(1, stu, planId);
+                // 更新录取状态
+                updateAdmissionStatus(1, stu);
+                saveStusToAdmission(stu, planId);
             }
             // 移除学生
             iterator.remove();
@@ -209,64 +163,65 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
             sortPlan.setMinScore(freePlan.get(planId));
             sortPlanList.add(sortPlan);
         }
+        // 排序
+        sortPlanList.sort((o1, o2) -> (int) (o2.getMinScore() - o1.getMinScore()));
 
-        Comparator<SortPlan> comparator = new Comparator<SortPlan>() {
-            @Override
-            public int compare(SortPlan o1, SortPlan o2) {
-                return (int) (o2.getMinScore() - o1.getMinScore());
-            }
-        };
-        sortPlanList.sort(comparator);
-
-        stuService.updateBatchById(updateAdmissionStus);
-        updateAdmissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-
-        stuService.updateBatchById(backList);
-        backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
-
-        saveBatch(admissionList);
-        admissionList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
         // 调剂录取
         swapAdmission(sortPlanList, swapDeque);
 
-        stuService.updateBatchById(backList);
-        stuService.updateBatchById(updateAdmissionStus);
+        // 把还在内存中的数据持久化
+        stuService.updateBatchById(admittedStusList);
         saveBatch(admissionList);
         return Result.ok();
     }
 
     /**
-     * 保存退档的学生
+     * 尝试录取并更新返回录取状态
      */
-    private void saveBackStus(Stu stu) {
-        // 加入退档队列, 即把学生状态改为退档
-        stu.setStatus(2);
-        backList.add(stu);
-        if (backList.size() >= BATCH_COUNT) {
-            // 批量更新
-            stuService.updateBatchById(backList);
-            backList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+    private int tryAdmissionAndUpdateAdStatus(String ad, Stu stu) {
+        boolean adSuccess = false;
+        Plan plan = null;
+        if (ad != null) {
+            // 获取学生志愿计划
+            plan = planService.getOne(new LambdaUpdateWrapper<Plan>().eq(Plan::getProfessionNum, ad));
+            // 判断是否能够录取
+            adSuccess = isSuccessAdmission(plan.getId(), stu);
         }
+        // 录取则直接录入
+        if (adSuccess) {
+            plan = planMap.get(plan.getId());
+            // 更新内存中的录取计划
+            normalAdmission(plan, stu);
+            return plan.getId();
+        }
+        return -1;
     }
 
     /**
-     * 保存录取的学生
+     * 更新学生的录取状态
      *
      * @param status
      * @param stu
      * @param planId
      */
-    private void saveAdmission(Integer status, Stu stu, Integer planId) {
+    private void updateAdmissionStatus(Integer status, Stu stu) {
         // 录取, 将学生插入录取队列中, 以方便批量更新
         stu.setStatus(status);
-        updateAdmissionStus.add(stu);
-        if (updateAdmissionStus.size() >= BATCH_COUNT) {
+        admittedStusList.add(stu);
+        if (admittedStusList.size() >= BATCH_COUNT) {
             // 批量更新
-            stuService.updateBatchById(updateAdmissionStus);
-            updateAdmissionStus = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
+            stuService.updateBatchById(admittedStusList);
+            admittedStusList = ListUtils.newArrayListWithExpectedSize(BATCH_COUNT);
         }
+    }
 
-        // 将学生插入录取表中
+    /**
+     * 将学生插入录取表中
+     *
+     * @param stu
+     * @param planId
+     */
+    private void saveStusToAdmission(Stu stu, Integer planId) {
         Admission admission = new Admission();
         admission.setPlanId(planId);
         admission.setStuId(stu.getId());
@@ -279,7 +234,6 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         }
     }
 
-
     /**
      * 调剂录取
      *
@@ -288,34 +242,34 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     private void swapAdmission(List<SortPlan> sortPlanList, Deque<Stu> swapDeque) {
         while (!swapDeque.isEmpty()) {
             // 得到调剂录取最高成绩的学生
-            Stu stu = swapDeque.peek();
+            Stu stu = swapDeque.pop();
 
             boolean isSuccess = false;
             for (SortPlan sortPlan : sortPlanList) {
                 // 最高分数的调剂专业,判断是否能录取
-                isSuccess = successAdmission(sortPlan.getPlanId(), stu);
+                isSuccess = isSuccessAdmission(sortPlan.getPlanId(), stu);
                 if (isSuccess) {
-                    // 该学生弹出调剂录取队列, 加入录取队列
-                    swapDeque.pop();
-                    saveAdmission(3, stu, sortPlan.getPlanId());
-                    swapAdmission(sortPlan.getPlanId());
+                    // 该学生加入录取队列
+                    updateAdmissionStatus(3, stu);
+                    saveStusToAdmission(stu, sortPlan.getPlanId());
+                    updatePlanNums(sortPlan.getPlanId());
                     break;
                 }
             }
             // 不能被录取, 放入退档队列
             if (!isSuccess) {
-                saveBackStus(stu);
+                updateAdmissionStatus(2, stu);
             }
         }
     }
 
     /**
-     * 调剂录取
+     * 调剂录取, 处理 内存中的录取情况
      *
      * @param planId
      * @return
      */
-    private void swapAdmission(Integer planId) {
+    private void updatePlanNums(Integer planId) {
         Plan plan = planMap.get(planId);
         plan.setPlanNum(plan.getPlanNum() - 1);
         if (plan.getPlanNum() <= 0) {
@@ -326,7 +280,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     }
 
     /**
-     * 正常录取
+     * 正常录取, 处理 内存中的录取情况
      */
     private int normalAdmission(Plan plan, Stu stu) {
         plan.setPlanNum(plan.getPlanNum() - 1);
@@ -346,9 +300,9 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
      *
      * @param planId
      * @param stu
-     * @return -1代表录取失败, 返回专业id
+     * @return
      */
-    private boolean successAdmission(Integer planId, Stu stu) {
+    private boolean isSuccessAdmission(Integer planId, Stu stu) {
         // 判断招生计划数
         Plan plan = planMap.get(planId);
         if (plan == null || plan.getPlanNum() <= 0) {
@@ -384,54 +338,48 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         return true;
     }
 
-
     @Override
     public Result professionIndex(int currentPage, int pageSize) {
         // 查询每个专业的最高分, 每个专业的最低分, 每个专业的平均分,
         Map<Integer, ProfessionDto> professionDtoMap = new HashMap<>();
         List<Plan> planList = planService.list();
+        List<ProfessionDto> records = new LinkedList<>();
+        // 计算出当前页起始位置
+        int start = (currentPage - 1) * pageSize;
         // 填充进map
-        for (Plan plan : planList) {
+        for (int i = start; i < start + pageSize && i < planList.size(); i++) {
+            Plan plan = planList.get(i);
             ProfessionDto professionDto = new ProfessionDto();
             professionDto.setProfessionNum(plan.getProfessionNum());
             professionDto.setProfessionName(plan.getProfessionName());
             professionDtoMap.put(plan.getId(), professionDto);
-        }
 
-        // 填充最高分和最高排位
-        for (Map.Entry<Integer, ProfessionDto> professionDtoEntry : professionDtoMap.entrySet()) {
-            Admission admission = admissionMapper.queryProfessionMaxRank(professionDtoEntry.getKey());
-            if (admission == null) continue;
-            Stu stu = stuService.getById(admission.getStuId());
-            ProfessionDto professionDto = professionDtoMap.get(admission.getPlanId());
-            professionDto.setMaxScore(stu.getScore());
-            professionDto.setMaxRank(stu.getStuRank());
-            professionDtoMap.put(professionDtoEntry.getKey(), professionDto);
-        }
+            // 填充最高分和最高排位
+            Admission admission = admissionMapper.queryProfessionMaxRank(plan.getId());
+            if (admission != null){
+                Stu stu = stuService.getById(admission.getStuId());
+                professionDto.setMaxScore(stu.getScore());
+                professionDto.setMaxRank(stu.getStuRank());
+            }
 
-        // 填充最低分和最低排位
-        for (Map.Entry<Integer, ProfessionDto> professionDtoEntry : professionDtoMap.entrySet()) {
-            Admission admission = admissionMapper.queryProfessionMinRank(professionDtoEntry.getKey());
-            if (admission == null) continue;
-            Stu stu = stuService.getById(admission.getStuId());
-            ProfessionDto professionDto = professionDtoMap.get(admission.getPlanId());
-            professionDto.setMinScore(stu.getScore());
-            professionDto.setMinRank(stu.getStuRank());
-            professionDtoMap.put(professionDtoEntry.getKey(), professionDto);
-        }
-        // 填充平均分
-        for (Map.Entry<Integer, ProfessionDto> professionDtoEntry : professionDtoMap.entrySet()) {
-            Double avgScore = admissionMapper.queryProfessionAvgScore(professionDtoEntry.getKey());
-            if (avgScore == null) continue;
-            ProfessionDto professionDto = professionDtoEntry.getValue();
-            professionDto.setAvgScore(avgScore);
-            professionDtoMap.put(professionDtoEntry.getKey(), professionDto);
+            // 填充最低分和最低排位
+            admission = admissionMapper.queryProfessionMinRank(plan.getId());
+            if (admission != null) {
+                Stu stu = stuService.getById(admission.getStuId());
+                professionDto.setMinScore(stu.getScore());
+                professionDto.setMinRank(stu.getStuRank());
+            }
+            // 填充平均分
+            Double avgScore = admissionMapper.queryProfessionAvgScore(plan.getId());
+            if (avgScore != null) {
+                professionDto.setAvgScore(avgScore);
+            };
+            records.add(professionDto);
         }
 
         // 分页
-        Collection<ProfessionDto> records = professionDtoMap.values();
         MyPage<ProfessionDto> professionDtoPage = new MyPage<>(currentPage, pageSize);
-        professionDtoPage.setPageRecords(records);
+        professionDtoPage.setRecords(records);
         professionDtoPage.setTotal(records.size());
         return Result.ok(professionDtoPage);
     }
@@ -535,10 +483,10 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         // 4 个的话下标为 1, 2
         int start = 0;
         int size = stuList.size();
-        if (size % 2 == 1){
+        if (size % 2 == 1) {
             start = size / 2;
             midScore = stuList.get(start).getScore();
-        }else{
+        } else {
             start = size / 2 - 1;
             midScore = (stuList.get(start).getScore() + stuList.get(start + 1).getScore()) / 2;
         }
