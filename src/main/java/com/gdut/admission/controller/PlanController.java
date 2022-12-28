@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 /**
  * <p>
  *  前端控制器
@@ -50,7 +54,7 @@ public class PlanController {
      * 修改招生计划
      */
     @PostMapping("update")
-    public Result update(@RequestBody Plan plan){
+    public Result update(@RequestBody Plan plan) throws IOException {
         // 修改招生计划
         return planService.updatePlan(plan);
     }

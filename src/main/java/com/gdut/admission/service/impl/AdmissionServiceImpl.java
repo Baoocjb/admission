@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.gdut.admission.query.AdmissionStusQuery;
 import com.gdut.admission.dto.*;
 import com.gdut.admission.entity.Admission;
 import com.gdut.admission.entity.Plan;
@@ -516,10 +515,10 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         if(admissionStuDto == null){
             admissionStuDto = new AdmissionStuDto();
         }
-        List<AdmissionStuDto> admissionStuDtoList = stuService.getAdStuByParams(admissionStuDto);
+        List<AdmissionStuDto> admissionStuDtoList = stuService.getAdStuByParams(admissionStuDto, currentPage, pageSize);
         // 分页
         MyPage<AdmissionStuDto> admissionStuDtoPage = new MyPage<>(currentPage, pageSize);
-        admissionStuDtoPage.setPageRecords(admissionStuDtoList);
+        admissionStuDtoPage.setRecords(admissionStuDtoList);
         admissionStuDtoPage.setTotal(admissionStuDtoList.size());
         return Result.ok(admissionStuDtoPage);
     }

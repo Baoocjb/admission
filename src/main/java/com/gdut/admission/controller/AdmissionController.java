@@ -9,10 +9,7 @@ import com.gdut.admission.entity.Stu;
 import com.gdut.admission.service.IAdmissionService;
 import com.gdut.admission.service.IStuService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -90,7 +87,7 @@ public class AdmissionController {
      * @return
      */
     @GetMapping("queryResult")
-    public Result getStuAdmissionByParams(@RequestBody(required = false)AdmissionStuDto admissionStuDto, int currentPage, int pageSize) {
+    public Result getStuAdmissionByParams(@RequestBody(required = false)AdmissionStuDto admissionStuDto, @RequestParam("currentPage") int currentPage,@RequestParam("pageSize") int pageSize) {
         return admissionService.getStuAdmissionByParams(admissionStuDto, currentPage, pageSize);
     }
 

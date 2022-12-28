@@ -3,6 +3,7 @@ package com.gdut.admission.mapper;
 import com.gdut.admission.dto.AdmissionStuDto;
 import com.gdut.admission.entity.Stu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,5 +17,5 @@ import java.util.List;
  */
 public interface StuMapper extends BaseMapper<Stu> {
 
-    List<Stu> getStuByParams(AdmissionStuDto admissionStuDto);
+    List<Stu> getStuByParams(@Param("admissionStuDto") AdmissionStuDto admissionStuDto, @Param("startIndex") int startIndex, @Param("pageSize") int pageSize);
 }

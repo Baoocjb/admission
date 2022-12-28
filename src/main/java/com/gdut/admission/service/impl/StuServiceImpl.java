@@ -143,17 +143,19 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
      * @return
      */
     @Override
-    public List<AdmissionStuDto> getAdStuByParams(AdmissionStuDto admissionStuDto) {
-        List<Stu> stuList = stuMapper.getStuByParams(admissionStuDto);
+    public List<AdmissionStuDto> getAdStuByParams(AdmissionStuDto admissionStuDto, int currentPage, int pageSize) {
+        List<Stu> stuList = stuMapper.getStuByParams(admissionStuDto, (currentPage - 1) * pageSize, pageSize);
         List<AdmissionStuDto> admissionStuDtoList = new ArrayList<>(stuList.size());
         for (Stu stu : stuList) {
-            Admission admission = admissionMapper.selectOne(new LambdaUpdateWrapper<Admission>().eq(Admission::getStuId, stu.getId()));
-            Plan plan = planMapper.selectById(admission.getPlanId());
             AdmissionStuDto adDto = new AdmissionStuDto();
             BeanUtils.copyProperties(stu, adDto);
-            adDto.setProfessionNum(plan.getProfessionNum());
-            adDto.setProfessionName(plan.getProfessionName());
-            adDto.setCollegeName(plan.getCollegeName());
+            if(admissionStuDto.getStatus() != 2){
+                Admission admission = admissionMapper.selectOne(new LambdaUpdateWrapper<Admission>().eq(Admission::getStuId, stu.getId()));
+                Plan plan = planMapper.selectById(admission.getPlanId());
+                adDto.setProfessionNum(plan.getProfessionNum());
+                adDto.setProfessionName(plan.getProfessionName());
+                adDto.setCollegeName(plan.getCollegeName());
+            }
             admissionStuDtoList.add(adDto);
         }
         return admissionStuDtoList;
