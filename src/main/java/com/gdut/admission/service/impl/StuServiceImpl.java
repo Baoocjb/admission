@@ -9,12 +9,20 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.gdut.admission.dto.AdmissionStuDto;
 import com.gdut.admission.dto.Result;
+import com.gdut.admission.entity.Admission;
+import com.gdut.admission.entity.Plan;
 import com.gdut.admission.entity.Stu;
 import com.gdut.admission.listener.StuListener;
+import com.gdut.admission.mapper.AdmissionMapper;
+import com.gdut.admission.mapper.PlanMapper;
 import com.gdut.admission.mapper.StuMapper;
+import com.gdut.admission.service.IAdmissionService;
+import com.gdut.admission.service.IPlanService;
 import com.gdut.admission.service.IStuService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -23,6 +31,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +45,12 @@ import java.util.List;
 @Service
 public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuService {
 
+    @Autowired
+    private StuMapper stuMapper;
+    @Autowired
+    private AdmissionMapper admissionMapper;
+    @Autowired
+    private PlanMapper planMapper;
 
     /**
      * 导入学生志愿信息至数据库中
@@ -120,5 +135,29 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
     @Override
     public List<Stu> backData() {
         return list(new LambdaUpdateWrapper<Stu>().eq(Stu::getStatus, 2));
+    }
+
+    /**
+     * 获取条件查询的dto
+     * @param admissionStuDto
+     * @return
+     */
+    @Override
+    public List<AdmissionStuDto> getAdStuByParams(AdmissionStuDto admissionStuDto, int currentPage, int pageSize) {
+        List<Stu> stuList = stuMapper.getStuByParams(admissionStuDto, (currentPage - 1) * pageSize, pageSize);
+        List<AdmissionStuDto> admissionStuDtoList = new ArrayList<>(stuList.size());
+        for (Stu stu : stuList) {
+            AdmissionStuDto adDto = new AdmissionStuDto();
+            BeanUtils.copyProperties(stu, adDto);
+            if(admissionStuDto.getStatus() != 2){
+                Admission admission = admissionMapper.selectOne(new LambdaUpdateWrapper<Admission>().eq(Admission::getStuId, stu.getId()));
+                Plan plan = planMapper.selectById(admission.getPlanId());
+                adDto.setProfessionNum(plan.getProfessionNum());
+                adDto.setProfessionName(plan.getProfessionName());
+                adDto.setCollegeName(plan.getCollegeName());
+            }
+            admissionStuDtoList.add(adDto);
+        }
+        return admissionStuDtoList;
     }
 }

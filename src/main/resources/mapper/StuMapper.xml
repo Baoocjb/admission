@@ -4,25 +4,46 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.gdut.admission.entity.Stu">
-        <id column="id" property="id" />
-        <result column="name" property="name" />
-        <result column="score" property="score" />
-        <result column="ad_one" property="adOne" />
-        <result column="ad_two" property="adTwo" />
-        <result column="ad_three" property="adThree" />
-        <result column="ad_four" property="adFour" />
-        <result column="ad_five" property="adFive" />
-        <result column="ad_six" property="adSix" />
-        <result column="is_swap" property="isSwap" />
-        <result column="stu_rank" property="stuRank" />
-        <result column="language" property="language" />
-        <result column="body_test" property="bodyTest" />
-        <result column="status" property="status" />
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="score" property="score"/>
+        <result column="ad_one" property="adOne"/>
+        <result column="ad_two" property="adTwo"/>
+        <result column="ad_three" property="adThree"/>
+        <result column="ad_four" property="adFour"/>
+        <result column="ad_five" property="adFive"/>
+        <result column="ad_six" property="adSix"/>
+        <result column="is_swap" property="isSwap"/>
+        <result column="stu_rank" property="stuRank"/>
+        <result column="language" property="language"/>
+        <result column="body_test" property="bodyTest"/>
+        <result column="status" property="status"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, name, score, ad_one, ad_two, ad_three, ad_four, ad_five, ad_six, is_swap, rank, language, body_test, status
+        id, name, score, ad_one, ad_two, ad_three, ad_four, ad_five, ad_six, is_swap, stu_rank, language, body_test, status
     </sql>
 
+    <select id="getStuByParams" resultMap="BaseResultMap">
+        select
+        s.id, s.name, s.score, s.ad_one, s.ad_two, s.ad_three, s.ad_four, s.ad_five, s.ad_six, s.is_swap, s.stu_rank, s.language, s.body_test, s.status
+        from t_stu s left join t_admission a on s.id = a.stu_id LEFT JOIN t_plan p on a.plan_id = p.id
+        <where>
+            <if test="admissionStuDto.collegeName != null and admissionStuDto.collegeName != ''">
+                and p.college_name like concat('%', #{admissionStuDto.collegeName},'%')
+            </if>
+            <if test="admissionStuDto.professionName != null and admissionStuDto.professionName != ''">
+                and p.profession_name like concat('%', #{admissionStuDto.professionName},'%')
+            </if>
+            <if test="admissionStuDto.name != null and admissionStuDto.name != ''">
+                and s.name like concat('%', #{admissionStuDto.name},'%')
+            </if>
+            <if test="admissionStuDto.status != 4">
+                and s.status = #{admissionStuDto.status}
+            </if>
+        </where>
+        order by s.stu_rank asc
+        limit #{startIndex}, #{pageSize}
+    </select>
 </mapper>

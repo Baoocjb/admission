@@ -509,4 +509,17 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         stuService.page(stuPage, new LambdaQueryWrapper<Stu>().eq(Stu::getStatus, 2));
         return Result.ok(stuPage);
     }
+
+    @Override
+    public Result getStuAdmissionByParams(AdmissionStuDto admissionStuDto, int currentPage, int pageSize) {
+        if(admissionStuDto == null){
+            admissionStuDto = new AdmissionStuDto();
+        }
+        List<AdmissionStuDto> admissionStuDtoList = stuService.getAdStuByParams(admissionStuDto, currentPage, pageSize);
+        // 分页
+        MyPage<AdmissionStuDto> admissionStuDtoPage = new MyPage<>(currentPage, pageSize);
+        admissionStuDtoPage.setRecords(admissionStuDtoList);
+        admissionStuDtoPage.setTotal(admissionStuDtoList.size());
+        return Result.ok(admissionStuDtoPage);
+    }
 }
