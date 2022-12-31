@@ -162,7 +162,7 @@
                                     </el-form-item>
                                 </el-col>
                                 <el-col :span="12">
-                                    <el-form-item label="专业代号" prop="professionId">
+                                    <el-form-item label="专业代号" prop="professionNum">
                                         <el-input v-model="formData.professionId"/>
                                     </el-form-item>
                                 </el-col>
@@ -401,11 +401,11 @@
                 dialogFormVisible: false,//控制表单是否可见
                 dialogFormVisible4Edit: false,//编辑表单是否可见
                 rules: {//校验规则
-                    groupId: [{required: true, message: '专业组号为必填项', trigger: 'blur'}]
-                    professionId: [{required: true, message: '专业代号为必填项', trigger: 'blur'}]
-                    professionName: [{required: true, message: '专业名称为必填项', trigger: 'blur'}]
-                    collegeName: [{required: true, message: '学院名称为必填项', trigger: 'blur'}]
-                    planNum: [{required: true, message: '招生计划数为必填项', trigger: 'blur'}]
+                    groupId: [{required: true, message: '专业组号为必填项', trigger: 'blur'}],
+                    professionNum: [{required: true, message: '专业代号为必填项', trigger: 'blur'}],
+                    professionName: [{required: true, message: '专业名称为必填项', trigger: 'blur'}],
+                    collegeName: [{required: true, message: '学院名称为必填项', trigger: 'blur'}],
+                    planNum: [{required: true, message: '招生计划数为必填项', trigger: 'blur'}],
                     location: [{required: true, message: '办学地点为必填项', trigger: 'blur'}]
                 }
             }
