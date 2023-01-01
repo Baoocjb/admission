@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 06/12/2022 22:45:09
+ Date: 29/12/2022 01:19:47
 */
 
 SET NAMES utf8mb4;
@@ -22,11 +22,13 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `t_admission`;
 CREATE TABLE `t_admission`  (
-  `id` bigint(0) NOT NULL,
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
   `stu_id` bigint(0) NOT NULL COMMENT '学生id',
   `plan_id` int(0) NOT NULL COMMENT '专业id',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uniq_stu_id`(`stu_id`) USING BTREE,
+  INDEX `uniq_plan_id`(`plan_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 20339 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for t_plan
@@ -45,8 +47,10 @@ CREATE TABLE `t_plan`  (
   `test_limit1` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '体检限制1',
   `test_limit2` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '体检限制2',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `index_profession_id`(`profession_num`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_profession_num`(`profession_num`) USING BTREE,
+  INDEX `idx_profession_name`(`profession_name`) USING BTREE,
+  INDEX `idx_college_name`(`college_name`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 388 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for t_stu
@@ -67,7 +71,9 @@ CREATE TABLE `t_stu`  (
   `language` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '外语语种',
   `body_test` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '体检备注',
   `status` int(0) UNSIGNED NULL DEFAULT 0 COMMENT '录取状态: 0 未录取, 1 已录取, 2 退档',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_stu_name`(`name`) USING BTREE,
+  INDEX `idx_rank`(`stu_rank`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 13724 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

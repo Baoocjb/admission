@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/admission")
@@ -99,7 +97,7 @@ public class AdmissionController {
     @GetMapping("downloadBack")
     public void downloadBack(HttpServletResponse response) throws IOException {
         // 忽略字段
-        Set<String> excludeColumnFiledNames = new HashSet<String>();
+        Set<String> excludeColumnFiledNames = new HashSet<>();
         excludeColumnFiledNames.add("status");
         try {
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

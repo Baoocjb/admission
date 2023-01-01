@@ -1,0 +1,288 @@
+{
+	"info": {
+		"_postman_id": "0092f523-928d-41f6-8fbb-ce9c8e9c89ab",
+		"name": "数据库",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "上传志愿信息",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Bao/Desktop/课设/平行志愿考生测试数据.xlsx"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/stu/upload",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"stu",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "查询志愿信息",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/stu/index?currentPage=0&pageSize=30",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"stu",
+						"index"
+					],
+					"query": [
+						{
+							"key": "currentPage",
+							"value": "0"
+						},
+						{
+							"key": "pageSize",
+							"value": "30"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "上传招生计划",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Bao/Desktop/课设/招生计划测试数据.xlsx"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8080/plan/upload",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"plan",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "查询招生计划信息",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/plan/index?currentPage=4&pageSize=6",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"plan",
+						"index"
+					],
+					"query": [
+						{
+							"key": "currentPage",
+							"value": "4"
+						},
+						{
+							"key": "pageSize",
+							"value": "6"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "开始录取",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "localhost:8080/admission/startAd",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admission",
+						"startAd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "查询录取结果",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/admission/profession?currentPage=1&pageSize=5",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admission",
+						"profession"
+					],
+					"query": [
+						{
+							"key": "currentPage",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "查询专业录取情况",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/admission/profession?currentPage=1&pageSize=120",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admission",
+						"profession"
+					],
+					"query": [
+						{
+							"key": "currentPage",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "120"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "查询学院录取情况",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/admission/college?currentPage=1&pageSize=100",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admission",
+						"college"
+					],
+					"query": [
+						{
+							"key": "currentPage",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "导出退档表",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/admission/downloadBack",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admission",
+						"downloadBack"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "统计学校信息",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/admission/school",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"admission",
+						"school"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
