@@ -102,7 +102,7 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
         if (!assertStuParams(stu)) {
             return Result.fail("参数不能为空!");
         }
-        if (getById(stu.getId()) == null) {
+        if (stu.getId() == null || getById(stu.getId()) == null) {
             return Result.fail("待删除记录不存在");
         }
         this.updateById(stu);
@@ -121,7 +121,6 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
                 || stu.getLanguage() == null
                 || stu.getIsSwap() == null
                 || stu.getStuRank() == null
-                || stu.getId() == null
         ) {
             return false;
         }

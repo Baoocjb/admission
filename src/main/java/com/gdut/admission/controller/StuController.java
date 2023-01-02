@@ -85,7 +85,7 @@ public class StuController {
     }
 
     @PostMapping("add")
-    public Result addStu(@RequestBody  Stu stu){
+    public Result addStu(@RequestBody Stu stu){
         return stuService.addStu(stu);
     }
 }
