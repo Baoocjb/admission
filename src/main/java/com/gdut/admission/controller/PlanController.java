@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
  * @since 2022-12-05
  */
 @RestController
-@RequestMapping("/plan")
+@RequestMapping("plan")
 public class PlanController {
     @Autowired
     private IPlanService planService;
@@ -80,5 +80,10 @@ public class PlanController {
             return Result.fail("待查询招生计划不存在!");
         }
         return Result.ok(plan);
+    }
+
+    @PostMapping("add")
+    public Result addPlan(@RequestBody Plan plan){
+        return planService.addPlan(plan);
     }
 }

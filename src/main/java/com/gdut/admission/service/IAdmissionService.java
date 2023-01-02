@@ -4,6 +4,10 @@ import com.gdut.admission.dto.AdmissionStuDto;
 import com.gdut.admission.dto.Result;
 import com.gdut.admission.entity.Admission;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.gdut.admission.entity.Stu;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * <p>
@@ -26,4 +30,5 @@ public interface IAdmissionService extends IService<Admission> {
     Result backIndex(int currentPage, int pageSize);
 
     Result getStuAdmissionByParams(AdmissionStuDto admissionStuDto, int currentPage, int pageSize);
+
 }

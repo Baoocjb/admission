@@ -30,4 +30,6 @@ public interface IStuService extends IService<Stu> {
     List<Stu> backData();
 
     List<AdmissionStuDto> getAdStuByParams(AdmissionStuDto admissionStuDto, int currentPage, int pageSize);
+
+    Result addStu(Stu stu);
 }

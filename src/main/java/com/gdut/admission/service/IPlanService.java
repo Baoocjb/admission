@@ -22,4 +22,6 @@ public interface IPlanService extends IService<Plan> {
     Result updatePlan(Plan plan);
 
     Result deletePlan(Integer planId);
+
+    Result addPlan(Plan plan);
 }

@@ -99,7 +99,21 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
 
     @Override
     public Result updateStu(Stu stu) {
+        if (!assertStuParams(stu)) {
+            return Result.fail("参数不能为空!");
+        }
+        if (getById(stu.getId()) == null) {
+            return Result.fail("待删除记录不存在");
+        }
+        this.updateById(stu);
+        return Result.ok();
+    }
 
+    /**
+     * 校验学生参数
+     * @return
+     */
+    private boolean assertStuParams(Stu stu){
         if (stu == null
                 || stu.getName() == null
                 || stu.getScore() == null
@@ -109,13 +123,9 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
                 || stu.getStuRank() == null
                 || stu.getId() == null
         ) {
-            return Result.fail("参数不能为空!");
+            return false;
         }
-        if (getById(stu.getId()) == null) {
-            return Result.fail("待删除记录不存在");
-        }
-        this.updateById(stu);
-        return Result.ok();
+        return true;
     }
 
     @Override
@@ -147,17 +157,29 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
         List<Stu> stuList = stuMapper.getStuByParams(admissionStuDto, (currentPage - 1) * pageSize, pageSize);
         List<AdmissionStuDto> admissionStuDtoList = new ArrayList<>(stuList.size());
         for (Stu stu : stuList) {
-            AdmissionStuDto adDto = new AdmissionStuDto();
-            BeanUtils.copyProperties(stu, adDto);
-            if(admissionStuDto.getStatus() != 2){
+            // 把退档的学生剔除
+            if(stu.getStatus() != 2){
+                AdmissionStuDto adDto = new AdmissionStuDto();
+                BeanUtils.copyProperties(stu, adDto);
+                // 查询该学生对应的录取结果
                 Admission admission = admissionMapper.selectOne(new LambdaUpdateWrapper<Admission>().eq(Admission::getStuId, stu.getId()));
                 Plan plan = planMapper.selectById(admission.getPlanId());
                 adDto.setProfessionNum(plan.getProfessionNum());
                 adDto.setProfessionName(plan.getProfessionName());
                 adDto.setCollegeName(plan.getCollegeName());
+                admissionStuDtoList.add(adDto);
             }
-            admissionStuDtoList.add(adDto);
         }
         return admissionStuDtoList;
+    }
+
+    @Override
+    @Transactional
+    public Result addStu(Stu stu) {
+        if(!assertStuParams(stu)){
+            return Result.fail("添加学生参数不能为空!");
+        }
+        stuMapper.insert(stu);
+        return Result.ok();
     }
 }

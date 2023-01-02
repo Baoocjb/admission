@@ -14,6 +14,7 @@ import com.gdut.admission.listener.StuListener;
 import com.gdut.admission.mapper.PlanMapper;
 import com.gdut.admission.service.IPlanService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,9 @@ import java.io.IOException;
  */
 @Service
 public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IPlanService {
+
+    @Autowired
+    private PlanMapper planMapper;
 
     /**
      * 招生计划信息导入至数据库中
@@ -80,6 +84,19 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
 
     @Override
     public Result updatePlan(Plan plan) {
+        if (!assertPlanParams(plan)) {
+            return Result.fail("参数不能为空!");
+        }
+        updateById(plan);
+        return Result.ok();
+    }
+
+    /**
+     * 校验计划参数
+     * @param plan
+     * @return
+     */
+    private boolean assertPlanParams(Plan plan){
         if (plan == null
                 || plan.getId() == null
                 || plan.getGroupId() == null
@@ -89,10 +106,9 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
                 || plan.getPlanNum() == null
                 || plan.getLocation() == null
         ) {
-            return Result.fail("参数不能为空!");
+            return false;
         }
-        updateById(plan);
-        return Result.ok();
+        return true;
     }
 
     @Override
@@ -101,6 +117,15 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
             return Result.fail("待删除记录不存在!");
         }
         removeById(planId);
+        return Result.ok();
+    }
+
+    @Override
+    public Result addPlan(Plan plan) {
+        if (!assertPlanParams(plan)) {
+            return Result.fail("添加计划参数不能为空!");
+        }
+        planMapper.insert(plan);
         return Result.ok();
     }
 }

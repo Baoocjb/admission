@@ -84,7 +84,7 @@ public class AdmissionController {
      *
      * @return
      */
-    @GetMapping("queryResult")
+    @PostMapping("queryResult")
     public Result getStuAdmissionByParams(@RequestBody(required = false)AdmissionStuDto admissionStuDto, @RequestParam("currentPage") int currentPage,@RequestParam("pageSize") int pageSize) {
         return admissionService.getStuAdmissionByParams(admissionStuDto, currentPage, pageSize);
     }
@@ -108,6 +108,42 @@ public class AdmissionController {
             // 这里需要设置不关闭流
             EasyExcel.write(response.getOutputStream(), Stu.class).autoCloseStream(Boolean.FALSE).excludeColumnFiledNames(excludeColumnFiledNames).sheet("退档学生表")
                     .doWrite(stuService.backData());
+        } catch (Exception e) {
+            // 重置response
+            response.reset();
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+            Map<String, String> map = MapUtils.newHashMap();
+            map.put("success", "false");
+            map.put("errorMsg", "下载文件失败" + e.getMessage());
+            map.put("data", null);
+            response.getWriter().println(JSON.toJSONString(map));
+        }
+    }
+
+    /**
+     * 打印退档队列
+     * @param response
+     * @throws IOException
+     */
+    @GetMapping("downloadAdmission")
+    public void downloadAdmission(HttpServletResponse response) throws IOException {
+        // 忽略字段
+        Set<String> excludeColumnFiledNames = new HashSet<>();
+        excludeColumnFiledNames.add("status");
+        excludeColumnFiledNames.add("id");
+
+        try {
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setCharacterEncoding("utf-8");
+            // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+            String fileName = URLEncoder.encode("拟录取学生表", "UTF-8").replaceAll("\\+", "%20");
+            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+            // 这里需要设置不关闭流
+            AdmissionStuDto admissionStuDto = new AdmissionStuDto();
+            admissionStuDto.setStatus(4);
+            EasyExcel.write(response.getOutputStream(), AdmissionStuDto.class).autoCloseStream(Boolean.FALSE).excludeColumnFiledNames(excludeColumnFiledNames).sheet("退档学生表")
+                    .doWrite(stuService.getAdStuByParams(admissionStuDto, 1, admissionService.count()));
         } catch (Exception e) {
             // 重置response
             response.reset();

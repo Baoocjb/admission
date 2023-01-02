@@ -100,7 +100,7 @@ public class Stu implements Serializable {
     private String bodyTest;
 
     /**
-     * 录取状态: 0 未录取, 1 已录取, 2 退档
+     * 录取状态: 0 未录取, 1 已录取, 2 退档, 3 调剂
      */
     private Integer status;
 

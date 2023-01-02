@@ -15,6 +15,7 @@ import com.gdut.admission.service.IAdmissionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.gdut.admission.service.IPlanService;
 import com.gdut.admission.service.IStuService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -352,6 +353,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
             ProfessionDto professionDto = new ProfessionDto();
             professionDto.setProfessionNum(plan.getProfessionNum());
             professionDto.setProfessionName(plan.getProfessionName());
+            professionDto.setCollegeName(plan.getCollegeName());
             professionDtoMap.put(plan.getId(), professionDto);
 
             // 填充最高分和最高排位
@@ -374,13 +376,14 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
             if (avgScore != null) {
                 professionDto.setAvgScore(avgScore);
             };
+
             records.add(professionDto);
         }
 
         // 分页
         MyPage<ProfessionDto> professionDtoPage = new MyPage<>(currentPage, pageSize);
         professionDtoPage.setRecords(records);
-        professionDtoPage.setTotal(records.size());
+        professionDtoPage.setTotal(planList.size());
         return Result.ok(professionDtoPage);
     }
 
@@ -522,4 +525,5 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         admissionStuDtoPage.setTotal(admissionStuDtoList.size());
         return Result.ok(admissionStuDtoPage);
     }
+
 }

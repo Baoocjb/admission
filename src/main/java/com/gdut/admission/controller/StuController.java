@@ -83,4 +83,9 @@ public class StuController {
         }
         return Result.ok(stu);
     }
+
+    @PostMapping("add")
+    public Result addStu(@RequestBody  Stu stu){
+        return stuService.addStu(stu);
+    }
 }

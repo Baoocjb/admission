@@ -11,6 +11,8 @@ public class ProfessionDto{
     private String professionNum;
     // 专业名称
     private String professionName;
+    // 所属学院名称
+    private String collegeName;
     // 专业最高分
     private Double maxScore;
     // 专业最高排位
