@@ -51,12 +51,13 @@
 
             <!--中间主题表格-->
             <el-main>
-<!--                <div id="chart" style="width: 800px;height: 600px">-->
-<!--                </div>-->
+
+                <div id="noone" style="width: 800px;height: 600px">
+                </div>
 
                 <template>
                     <el-table
-                            :data="admission"
+                            :data="profession"
                             style="width: 100%"
                             :row-class-name="tableRowClassName">
                         <el-table-column
@@ -128,6 +129,7 @@
 
         //生命周期相关方法,页面加载完成后执行的函数
         mounted() {
+            this.professionRange();
             this.selectAll();
         },
 
@@ -139,8 +141,9 @@
                     method: "get",
                     url: "http://localhost:8080/admission/profession?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
                 }).then((resp) => {
+                    // console.log(resp.data.data);
                     // 设置表格数据
-                    this.admission = resp.data.data.records;
+                    this.profession = resp.data.data.records;
                     // 设置总条目数
                     this.totalCount = resp.data.data.total;
                 })
@@ -169,38 +172,41 @@
                 return '';
             },
 
-            // professionRange() {
-            //     axios({
-            //         method: "get",
-            //         url: "http://localhost:8080/admission/college?currentPage=1&pageSize=20",
-            //     }).then((resp) => {
-            //         // 将数据转为想要的格式
-            //         let collegeNames = [];
-            //         let avgScores = [];
-            //         for (let i = 0; i < resp.data.length; i++) {
-            //             collegeNames[i] = resp.data.data.records[i].collegeName;
-            //             avgScores[i] = resp.data.data.records[i].avgScore;
-            //         }
-            //         //resp.data
-            //         var mChart = echarts.init(document.getElementById('chart'));
-            //         var option = {
-            //             xAxis: {
-            //                 type: 'category',
-            //                 data: collegeNames
-            //             },
-            //             yAxis: {
-            //                 type: 'value'
-            //             },
-            //             series: [
-            //                 {
-            //                     data: avgScores,
-            //                     type: 'bar'
-            //                 }
-            //             ]
-            //         };
-            //         mChart.setOption(option);
-            //     })
-            // },
+            professionRange() {
+                axios({
+                    method: "get",
+                    url: "http://localhost:8080/admission/profession?currentPage=1&pageSize=20",
+                }).then((resp) => {
+                    // 将数据转为想要的格式
+                    let collegeNames = [];
+                    let avgScores = [];
+                    for (let i = 0; i < resp.data.data.pageSize; i++) {
+                        collegeNames[i] = resp.data.data.records[i].professionName;
+                        avgScores[i] = resp.data.data.records[i].avgScore;
+                    }
+                    console.log(collegeNames);
+                    console.log(avgScores);
+                    //resp.data
+                    var mChart = echarts.init(document.getElementById('noone'));
+                    var option = {
+                        tooltip: {},
+                        xAxis: {
+                            type: 'category',
+                            data: collegeNames
+                        },
+                        yAxis: {
+                            type: 'value'
+                        },
+                        series: [
+                            {
+                                data: avgScores,
+                                type: 'bar'
+                            }
+                        ]
+                    };
+                    mChart.setOption(option);
+                })
+            },
 
         },
 
@@ -214,7 +220,7 @@
                 // 当前页码
                 currentPage: 1,
                 // 每页记录数
-                pageSize: 5,
+                pageSize: 20,
                 // 删除功能对话框
                 dialogVisible: false,
                 // 搜索表单数据
@@ -223,6 +229,7 @@
                 },
                 // 复选框数据集合
                 multipleSelection: [],
+                profession: '',
                 // 表格数据
                 tableData: [{
                     name: "小黑",
@@ -233,25 +240,8 @@
                     college: '机电学院',
                     major: '机械类',
                     //录取记录
-                    record: '已录取'
-                }, {
-                    name: "小黑",
-                    score: "599",
-                    rank: "25888",
-                    number: "002",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    record: '已录取'
-                }, {
-                    name: "小黑",
-                    score: "599",
-                    rank: "25888",
-                    number: "002",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    record: '已录取'
+                    record: '已录取',
+                    avgScore: "233",
                 }]
             }
         }
