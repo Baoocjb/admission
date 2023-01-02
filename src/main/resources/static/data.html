@@ -177,9 +177,13 @@
                     method: "get",
                     url: "http://localhost:8080/admission/profession?currentPage=1&pageSize=20",
                 }).then((resp) => {
+                    // switch 获取展示的数据分组
                     // 将数据转为想要的格式
                     let collegeNames = [];
                     let avgScores = [];
+                    let com = ['计算机学院','材料类', '能源动力类', '微电子'];
+                    let comMaxScore = ['最高分', 43.3, 85.8, 93.7];
+                    let comMinScore = ['最低分', 83.1, 73.4, 55.1];
                     for (let i = 0; i < resp.data.data.pageSize; i++) {
                         collegeNames[i] = resp.data.data.records[i].professionName;
                         avgScores[i] = resp.data.data.records[i].avgScore;
@@ -189,20 +193,25 @@
                     //resp.data
                     var mChart = echarts.init(document.getElementById('noone'));
                     var option = {
+                        legend: {},
                         tooltip: {},
-                        xAxis: {
-                            type: 'category',
-                            data: collegeNames
+                        dataset: {
+                            source: [
+                                com,
+                                comMaxScore,
+                                comMinScore
+                            ]
                         },
-                        yAxis: {
-                            type: 'value'
-                        },
-                        series: [
-                            {
-                                data: avgScores,
-                                type: 'bar'
+                        xAxis: { type: 'category' },
+                        yAxis: {},
+                        series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
                             }
-                        ]
+                        }
                     };
                     mChart.setOption(option);
                 })

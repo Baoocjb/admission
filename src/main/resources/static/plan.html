@@ -53,8 +53,10 @@
             <el-main>
                 <!--上传按钮-->
                 <el-row>
+                    <el-button type="primary" @click="handleCreate" style="display: inline;margin-right: 20px">新增单个专业计划</el-button>
                     <el-upload
                             class="upload-demo"
+                            style="display: inline"
                             name="file"
                             action="http://localhost:8080/plan/upload"
                             :on-preview="handlePreview"
@@ -66,7 +68,7 @@
                             :limit="3"
                             :on-exceed="handleExceed"
                             :file-list="fileList">
-                        <el-button size="middle" type="primary">招生计划导入</el-button>
+                        <el-button size="middle" type="primary">招生计划批量导入</el-button>
                     </el-upload>
                 </el-row>
 
@@ -226,6 +228,79 @@
                     </el-dialog>
                 </div>
 
+                <!--新增专业计划窗口-->
+                <div class="add-form">
+                    <el-dialog title="新增专业计划" :visible.sync="dialogFormVisible">
+                        <el-form ref="dataAddForm" :model="formData" :rules="rules" label-position="right"
+                                 label-width="100px">
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="专业组号" prop="groupId">
+                                        <el-input v-model="formData.groupId"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="专业代号" prop="professionNum">
+                                        <el-input v-model="formData.professionId"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="专业名称" prop="professionName">
+                                        <el-input v-model="formData.professionName"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="学院名称" prop="collegeName">
+                                        <el-input v-model="formData.collegeName"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="招生计划数" prop="planNum">
+                                        <el-input v-model="formData.planNum"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="专业备注"  prop="comment">
+                                        <el-input v-model="formData.comment"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="办学地点" prop="location">
+                                        <el-input v-model="formData.location"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="外语语种"  prop="language">
+                                        <el-input v-model="formData.language"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="12">
+                                    <el-form-item label="体检受限1" prop="testLimit1">
+                                        <el-input v-model="formData.testLimit1"/>
+                                    </el-form-item>
+                                </el-col>
+                                <el-col :span="12">
+                                    <el-form-item label="体检受限2"  prop="testLimit2">
+                                        <el-input v-model="formData.testLimit2"/>
+                                    </el-form-item>
+                                </el-col>
+                            </el-row>
+                        </el-form>
+                        <div slot="footer" class="dialog-footer">
+                            <el-button @click="dialogFormVisible = false">取消</el-button>
+                            <el-button type="primary" @click="handleAdd()">确定</el-button>
+                        </div>
+                    </el-dialog>
+                </div>
+
             </el-main>
         </el-container>
     </el-container>
@@ -378,7 +453,37 @@
                     //3.取消删除
                     this.$message.info("取消删除操作");
                 });
-            }
+            },
+
+            //弹出添加窗口
+            handleCreate() {
+                this.dialogFormVisible = true;
+                this.resetForm();
+            },
+
+            //重置表单
+            resetForm() {
+                this.formData = {};
+            },
+
+            //添加
+            handleAdd() {
+                //发送添加异步请求，根据结果提示成功或者失败
+                axios({
+                    method: "post",
+                    url: "http://localhost:8080/plan/add",
+                    data: this.formData
+                }).then((resp) => {
+                    if (resp.data.success) {
+                        this.dialogFormVisible = false;
+                        this.$message.success("添加成功");
+                    } else {
+                        this.$message.error(res.data.errorMsg);
+                    }
+                }).finally(()=>{
+                    this.selectAll();
+                });
+            },
 
         },
 
@@ -399,6 +504,10 @@
                 dialogVisible: false,
                 //点击上传功能
                 fileList: [],
+                // 添加窗口
+                dialogFormVisible: false,
+                // 表单数据
+                formData: {},
                 // 表格数据
                 plan: [{
                     id: '1',

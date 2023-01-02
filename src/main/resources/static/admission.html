@@ -69,12 +69,12 @@
                     <el-form-item label="录取情况">
                         <el-input v-model="admissionStuDto.status" placeholder="录取情况"></el-input>
                     </el-form-item>
-
-                    <el-form-item>
-                        <el-button type="primary" @click="search">查询</el-button>
-                        <el-button type="success" @click="">导出</el-button>
-                    </el-form-item>
                 </el-form>
+
+                <div>
+                    <el-button type="primary" @click="search">条件查询录取结果</el-button>
+                    <el-button type="success" @click="downloadAdmission">导出录取学生表</el-button>
+                </div>
 
                 <!--表格-->
                 <template>
@@ -168,6 +168,97 @@
                         :total="totalCount">
                 </el-pagination>
 
+<!--                <div class="add-form">-->
+<!--                    <el-dialog title="新增专业计划" :visible.sync="dialogFormVisible">-->
+<!--                        <el-form ref="dataAddForm" :model="formData" :rules="rules" label-position="right"-->
+<!--                                 label-width="100px">-->
+<!--                            <template>-->
+<!--                                <el-table-->
+<!--                                        :data="formData"-->
+<!--                                        style="width: 100%"-->
+<!--                                        :row-class-name="tableRowClassName">-->
+<!--                                    <el-table-column-->
+<!--                                            type="index">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="name"-->
+<!--                                            label="姓名"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="score"-->
+<!--                                            label="投档成绩"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="adOne"-->
+<!--                                            label="专业志愿1"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="adTwo"-->
+<!--                                            label="专业志愿2"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="adThree"-->
+<!--                                            label="专业志愿3"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="adFour"-->
+<!--                                            label="专业志愿4"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="adFive"-->
+<!--                                            label="专业志愿5"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="adSix"-->
+<!--                                            label="专业志愿6"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            label="服从调剂"-->
+<!--                                            align="center">-->
+<!--                                        <template slot-scope="scope">-->
+<!--                                            {{ getSwapStr(scope.row.isSwap) }}-->
+<!--                                        </template>-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="stuRank"-->
+<!--                                            label="学生排位"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="language"-->
+<!--                                            label="外语语种"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            prop="bodyTest"-->
+<!--                                            label="体检备注"-->
+<!--                                            align="center">-->
+<!--                                    </el-table-column>-->
+<!--                                    <el-table-column-->
+<!--                                            label="录取状态"-->
+<!--                                            align="center">-->
+<!--                                        <template slot-scope="scope">-->
+<!--                                            {{ getStatusStr(scope.row.status) }}-->
+<!--                                        </template>-->
+<!--                                    </el-table-column>-->
+<!--                                </el-table>-->
+<!--                            </template>-->
+<!--                        </el-form>-->
+<!--                        <div slot="footer" class="dialog-footer">-->
+<!--                            <el-button @click="dialogFormVisible = false">取消</el-button>-->
+<!--                            <el-button type="primary" @click="handleAdd()">确定</el-button>-->
+<!--                        </div>-->
+<!--                    </el-dialog>-->
+<!--                </div>-->
+
             </el-main>
         </el-container>
     </el-container>
@@ -206,13 +297,18 @@
 
             search() {
                 axios({
-                    method: "get",
+                    method: "post",
                     url: "http://localhost:8080/admission/queryResult?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
                     data: this.admissionStuDto
                 }).then((resp) => {
                     // 传回来他的专业代码
                     console.log(resp.data)
                 })
+            },
+
+            // 导出录取学生信息
+            downloadAdmission(){
+                window.open('http://localhost:8080/admission/downloadAdmission');
             },
 
             // 分页工具条方法
