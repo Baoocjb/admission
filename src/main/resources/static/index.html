@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!--    <meta http-equiv="refresh" content="20">-->
     <title>平行志愿模拟录取系统-志愿信息</title>
 </head>
 <body>
@@ -52,11 +53,15 @@
             <el-main>
                 <!--导入按钮-->
                 <el-row>
+                    <el-button type="success" @click="startAd" style="display: inline;margin-right: 20px">开始录取</el-button>
                     <el-upload
+                            style="display: inline"
                             class="upload-demo"
                             name="file"
                             action="http://localhost:8080/stu/upload"
                             :on-preview="handlePreview"
+                            :on-progress="wait"
+                            :on-success="refresh"
                             :on-remove="handleRemove"
                             :before-remove="beforeRemove"
                             multiple
@@ -65,13 +70,16 @@
                             :file-list="fileList">
                         <el-button size="middle" type="primary">志愿信息导入</el-button>
                     </el-upload>
-                    <br>
-                    <el-button type="success" @click="startAd">开始录取</el-button>
+
                 </el-row>
 
                 <!--表格-->
                 <template>
                     <el-table
+                            v-loading="loading"
+                            element-loading-text="录取工作进行中"
+                            element-loading-spinner="el-icon-loading"
+                            element-loading-background="rgba(0, 0, 0, 0.8)"
                             :data="stu"
                             style="width: 100%"
                             :row-class-name="tableRowClassName">
@@ -267,12 +275,26 @@
 
         //方法
         methods: {
+
+            wait(){
+                this.$message('数据导入中，请稍候');
+            },
+
+            refresh(){
+                this.fileList = [];
+                this.selectAll();
+            },
+
             //查询所有志愿信息
             selectAll() {
                 axios({
                     method: "get",
                     url: "http://localhost:8080/stu/index?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
                 }).then((resp) => {
+                    // if(resp.data.success){
+                    //     this.loadind = false;
+                    //     console.log("1")
+                    // }
                     // // 设置表格数据
                     this.stu = resp.data.data.records;
                     // // 设置总条目数
@@ -343,10 +365,14 @@
 
             // 开始录取
             startAd(){
+                this.$message('录取工作进行中');
+                this.loading = true;
+                // 提示录取工作进行中
                 axios({
                     method: "get",
                     url: "http://localhost:8080/admission/startAd"
                 }).then((resp) => {
+                    this.loading = false;
                     if (resp.data.success){
                         this.$message({
                             message: '录取工作已完成',
@@ -457,7 +483,8 @@
                 dialogFormVisible4Edit: false,//编辑表单是否可见
                 rules: {//校验规则
                     adOne: [{required: true, message: '专业志愿1为必填项', trigger: 'blur'}]
-                }
+                },
+                loading: false
             }
         }
     })
