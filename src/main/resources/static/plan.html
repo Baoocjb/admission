@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+<!--    <meta http-equiv="refresh" content="20">-->
     <title>平行志愿模拟录取系统-招生计划</title>
 </head>
 <body>
@@ -57,6 +58,8 @@
                             name="file"
                             action="http://localhost:8080/plan/upload"
                             :on-preview="handlePreview"
+                            :on-progress="wait"
+                            :on-success="refresh"
                             :on-remove="handleRemove"
                             :before-remove="beforeRemove"
                             multiple
@@ -246,6 +249,19 @@
 
         //方法
         methods: {
+
+            wait(){
+                this.$message({
+                    message: '数据导入中，请稍后',
+                    duration: 1000
+                });
+            },
+
+            refresh(){
+                this.fileList = [];
+                this.selectAll();
+            },
+
             //查询招生计划信息
             selectAll() {
                 axios({

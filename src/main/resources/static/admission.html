@@ -52,26 +52,26 @@
             <!--中间主题表格-->
             <el-main>
                 <!--搜索表单-->
-                <el-form :inline="true" :model="absoluteTable" class="demo-form-inline">
+                <el-form :inline="true" :model="admissionStuDto" class="demo-form-inline">
 
                     <el-form-item label="姓名">
-                        <el-input v-model="absoluteTable.name" placeholder="姓名"></el-input>
+                        <el-input v-model="admissionStuDto.name" placeholder="姓名"></el-input>
                     </el-form-item>
 
                     <el-form-item label="学院">
-                        <el-input v-model="absoluteTable.college" placeholder="学院"></el-input>
+                        <el-input v-model="admissionStuDto.collegeName" placeholder="学院"></el-input>
                     </el-form-item>
 
                     <el-form-item label="专业">
-                        <el-input v-model="absoluteTable.major" placeholder="专业"></el-input>
+                        <el-input v-model="admissionStuDto.professionName" placeholder="专业"></el-input>
                     </el-form-item>
 
                     <el-form-item label="录取情况">
-                        <el-input v-model="absoluteTable.record" placeholder="录取情况"></el-input>
+                        <el-input v-model="admissionStuDto.status" placeholder="录取情况"></el-input>
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="primary" @click="">查询</el-button>
+                        <el-button type="primary" @click="search">查询</el-button>
                         <el-button type="success" @click="">导出</el-button>
                     </el-form-item>
                 </el-form>
@@ -204,6 +204,17 @@
                 })
             },
 
+            search() {
+                axios({
+                    method: "get",
+                    url: "http://localhost:8080/admission/queryResult?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
+                    data: this.admissionStuDto
+                }).then((resp) => {
+                    // 传回来他的专业代码
+                    console.log(resp.data)
+                })
+            },
+
             // 分页工具条方法
             handleSizeChange(val) {
                 // 重新设置每页显示的条数
@@ -276,11 +287,11 @@
                 // 删除功能对话框
                 dialogVisible: false,
                 // 搜索表单数据
-                absoluteTable: {
-                    name: '',
+                admissionStuDto: {
+                    collegeName: '',
                     college: '',
-                    majoe: '',
-                    record: ''
+                    professionName: '',
+                    status: 4
                 },
                 // 表格数据
                 admission: [{
