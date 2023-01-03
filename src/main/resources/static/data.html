@@ -100,9 +100,11 @@
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="avgScore"
                                 label="平均分数"
                                 align="center">
+                            <template slot-scope="scope">
+                                {{(scope.row.avgScore).toFixed(1) }}
+                            </template>
                         </el-table-column>
                     </el-table>
                 </template>
@@ -762,6 +764,5 @@
         }
     })
 </script>
-<script src="js/data.js"></script>
 </body>
 </html>
