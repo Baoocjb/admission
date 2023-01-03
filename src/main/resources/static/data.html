@@ -51,11 +51,18 @@
 
             <!--中间主题表格-->
             <el-main>
+                <div>
+                    <h1 style="display: inline;margin-left:500px;">各学院专业录取情况统计</h1>
+                    <el-button type="primary" @click="search" style="display: inline;margin-left: 300px">点击展开前1%考生信息</el-button>
+                </div>
+                <br>
+                <div>
+                    <div id="CN" style="width: 315px;height: 300px;float: left"></div>
+                    <div id="JSJ" style="width: 315px;height: 300px;float: left"></div>
+                    <div id="HJ" style="width: 315px;height: 300px;float: left"></div>
+                    <div id="JD" style="width: 315px;height: 300px;float: left"></div>
+                </div>
 
-                <div id="CN" style="width: 315px;height: 300px;float: left"></div>
-                <div id="JSJ" style="width: 315px;height: 300px;float: left"></div>
-                <div id="HJ" style="width: 315px;height: 300px;float: left"></div>
-                <div id="JD" style="width: 315px;height: 300px;float: left"></div>
 
                 <template>
                     <el-table
@@ -110,6 +117,31 @@
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="totalCount">
                 </el-pagination>
+
+                <!--模糊查询结果表格窗口-->
+                <el-dialog title="条件查询结果" :visible.sync="dialogTableVisible">
+                    <el-table :data="gridData">
+                        <el-table-column property="name" label="姓名" align="center"></el-table-column>
+                        <el-table-column property="score" label="分数" align="center"></el-table-column>
+                        <el-table-column property="stuRank" label="排位" align="center"></el-table-column>
+                        <el-table-column property="collegeName" label="录取学院" align="center"></el-table-column>
+                        <el-table-column property="professionName" label="录取专业" align="center"></el-table-column>
+                        <el-table-column label="录取志愿" align="center">
+                            <template slot-scope="scope">
+                                {{ getAdStr(scope.row) }}
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                            @size-change="handleSizeChangeSearch"
+                            @current-change="handleCurrentChangeSearch"
+                            :current-page="currentPageSearch"
+                            :page-sizes="[15, 30, 40, 50]"
+                            :page-size="pageSizeSearch"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="totalCountSearch">
+                    </el-pagination>
+                </el-dialog>
 
             </el-main>
         </el-container>
@@ -644,6 +676,50 @@
                 };
                 mChart.setOption(option);
             },
+
+            //统计前1%
+            search() {
+                axios({
+                    method: "get",
+                    url: "http://localhost:8080/admission/queryTheBest?currentPage=" + this.currentPageSearch + "&pageSize=" + this.pageSizeSearch,
+                }).then((resp) => {
+                    // 传回来他的专业代码
+                    this.dialogTableVisible = true;
+                    this.gridData = resp.data.data.records;
+                    // 设置总条目数
+                    this.totalCountSearch = resp.data.data.total;
+                })
+            },
+            handleSizeChangeSearch(val) {
+                // 重新设置每页显示的条数
+                this.pageSizeSearch = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.search();
+            },
+            handleCurrentChangeSearch(val) {
+                // 重新设置当前页码
+                this.currentPageSearch = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.search();
+            },
+            // 计算录取志愿
+            getAdStr(row){
+                if (row.professionNum == row.adOne) {
+                    return '第一志愿'
+                } else if (row.professionNum == row.adTwo) {
+                    return '第二志愿'
+                } else if (row.professionNum == row.adThree) {
+                    return '第三志愿'
+                } else if (row.professionNum == row.adFour) {
+                    return '第四志愿'
+                } else if (row.professionNum == row.adFive) {
+                    return '第五志愿'
+                } else if (row.professionNum == row.adSix) {
+                    return '第六志愿'
+                } else {
+                    return '调剂录取'
+                }
+            },
         },
 
         //数据
@@ -653,10 +729,13 @@
                 disabled: true,
                 // 总记录数量
                 totalCount: 10,
+                totalCountSearch: 10,
                 // 当前页码
                 currentPage: 1,
+                currentPageSearch: 1,
                 // 每页记录数
                 pageSize: 20,
+                pageSizeSearch: 15,
                 // 删除功能对话框
                 dialogVisible: false,
                 // 搜索表单数据
@@ -676,82 +755,9 @@
                     avgScore: ''
                 }],
                 // 表格数据
-                tableData: [{
-                    name: "小黑",
-                    score: "599",
-                    rank: "25888",
-                    number: "002",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    //录取记录
-                    record: '已录取',
-                    avgScore: "233",
-                    collegeName: '',
-                }],
-                // CN : ['材料与能源学院'],
-                // CNMaxScore : ['最高分'],
-                // CNMinScore : ['最低分'],
-                //
-                // JSJ : ['计算机学院'],
-                // JSJMaxScore : ['最高分'],
-                // JSJMinScore : ['最低分'],
-                //
-                // HJ : ['环境科学与工程学院'],
-                // HJMaxScore : ['最高分'],
-                // HJMinScore : ['最低分'],
-                //
-                // JD : ['机电工程学院'],
-                // JDMaxScore : ['最高分'],
-                // JDMinScore : ['最低分'],
-                //
-                // GL : ['管理学院'],
-                // GLMaxScore : ['最高分'],
-                // GLMinScore : ['最低分'],
-                //
-                // JM : ['经济与贸易学院'],
-                // JMMaxScore : ['最高分'],
-                // JMMinScore : ['最低分'],
-                //
-                // QG : ['轻工化工学院'],
-                // QGMaxScore : ['最高分'],
-                // QGMinScore : ['最低分'],
-                //
-                // SW : ['生物医药学院'],
-                // SWMaxScore : ['最高分'],
-                // SWMinScore : ['最低分'],
-                //
-                // TM : ['土木与交通工程学院'],
-                // TMMaxScore : ['最高分'],
-                // TMMinScore : ['最低分'],
-                //
-                // WGY : ['外国语学院'],
-                // WGYMaxScore : ['最高分'],
-                // WGYMinScore : ['最低分'],
-                //
-                // WL : ['物理与光电工程学院'],
-                // WLMaxScore : ['最高分'],
-                // WLMinScore : ['最低分'],
-                //
-                // XG : ['信息工程学院'],
-                // XGMaxScore : ['最高分'],
-                // XGMinScore : ['最低分'],
-                //
-                // YS : ['艺术与设计学院'],
-                // YSMaxScore : ['最高分'],
-                // YSMinScore : ['最低分'],
-                //
-                // SX : ['应用数学学院'],
-                // SXMaxScore : ['最高分'],
-                // SXMinScore : ['最低分'],
-                //
-                // ZF : ['政法学院'],
-                // ZFMaxScore : ['最高分'],
-                // ZFMinScore : ['最低分'],
-                //
-                // ZDH : ['自动化学院'],
-                // ZDHMaxScore : ['最高分'],
-                // ZDHMinScore : ['最低分'],
+                tableData: [],
+                gridData: [],
+                dialogTableVisible: false,
             }
         }
     })

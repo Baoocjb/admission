@@ -176,6 +176,7 @@
                         :total="totalCount">
                 </el-pagination>
 
+                <!--模糊查询结果表格窗口-->
                 <el-dialog title="条件查询结果" :visible.sync="dialogTableVisible">
                     <el-table :data="gridData">
                         <el-table-column property="name" label="姓名" align="center"></el-table-column>
