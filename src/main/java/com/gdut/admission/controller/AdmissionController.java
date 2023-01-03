@@ -103,10 +103,10 @@ public class AdmissionController {
      */
     @ApiOperation(value = "查询录取结果前1%学生信息")
     @GetMapping("queryTheBest")
-    public Result queryTheBest() {
+    public Result queryTheBest(@RequestParam("currentPage") int currentPage,@RequestParam("pageSize") int pageSize) {
         AdmissionStuDto admissionStuDto = new AdmissionStuDto();
         admissionStuDto.setStatus(4);
-        return admissionService.getStuAdmissionByParams(admissionStuDto, 1, (int)(admissionService.count() * 0.01));
+        return admissionService.getTheBestStus(admissionStuDto, currentPage, pageSize);
     }
 
     /**

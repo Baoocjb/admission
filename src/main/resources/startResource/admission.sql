@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 29/12/2022 01:19:47
+ Date: 03/01/2023 21:31:10
 */
 
 SET NAMES utf8mb4;
@@ -26,9 +26,9 @@ CREATE TABLE `t_admission`  (
   `stu_id` bigint(0) NOT NULL COMMENT '学生id',
   `plan_id` int(0) NOT NULL COMMENT '专业id',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uniq_stu_id`(`stu_id`) USING BTREE,
-  INDEX `uniq_plan_id`(`plan_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 20339 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  UNIQUE INDEX `idx_stu_id`(`stu_id`) USING BTREE,
+  INDEX `idx_plan_id`(`plan_id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 6780 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for t_plan
@@ -50,7 +50,7 @@ CREATE TABLE `t_plan`  (
   INDEX `idx_profession_num`(`profession_num`) USING BTREE,
   INDEX `idx_profession_name`(`profession_name`) USING BTREE,
   INDEX `idx_college_name`(`college_name`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 388 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 98 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for t_stu
@@ -70,10 +70,10 @@ CREATE TABLE `t_stu`  (
   `stu_rank` int(0) NOT NULL COMMENT '学生排位',
   `language` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '外语语种',
   `body_test` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '体检备注',
-  `status` int(0) UNSIGNED NULL DEFAULT 0 COMMENT '录取状态: 0 未录取, 1 已录取, 2 退档',
+  `status` int(0) UNSIGNED NULL DEFAULT 0 COMMENT '录取状态: 0 未录取, 1 已录取, 2 退档, 3 调剂录取',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_stu_name`(`name`) USING BTREE,
-  INDEX `idx_rank`(`stu_rank`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 13724 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_name`(`name`) USING BTREE,
+  INDEX `idx_stu_rank`(`stu_rank`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 6863 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

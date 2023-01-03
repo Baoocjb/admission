@@ -31,4 +31,5 @@ public interface IAdmissionService extends IService<Admission> {
 
     Result getStuAdmissionByParams(AdmissionStuDto admissionStuDto, int currentPage, int pageSize);
 
+    Result getTheBestStus(AdmissionStuDto admissionStuDto, int currentPage, int pageSize);
 }
