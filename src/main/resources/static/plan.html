@@ -332,9 +332,18 @@
                 });
             },
 
-            refresh(){
+            refresh(response){
                 this.fileList = [];
                 this.selectAll();
+                if(response.success != "success"){
+                    this.$message({
+                        message: response.errorMsg,
+                        type: 'false'
+                    });
+                }
+                this.fileList = [];
+                this.selectAll();
+
             },
 
             //查询招生计划信息

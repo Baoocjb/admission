@@ -1,7 +1,7 @@
 spring:
   datasource:
     username: root
-    password: click.
+    password: abc12345678
     url: jdbc:mysql://localhost:3306/admission?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
@@ -9,6 +9,17 @@ spring:
       matching-strategy: ANT-PATH-MATCHER
   banner:
     location: classpath:banner/banner.txt
+  servlet:
+    multipart:
+      max-file-size: 5MB      # 文件上传大小限制，设置最大值，不能超过该值，否则报错
+      #      max-file-size: 500KB      # 文件上传大小限制，设置最大值，不能超过该值，否则报错
+      max-request-size: 5MB     # 文件最大请求限制，用于批量上传
+  #      max-request-size: 500KB
+
+server:
+  tomcat:
+    uri-encoding: utf-8
+    max-swallow-size: -1 # tomcat 默认大小2M, 超过2M的文件不会被捕获, 需要调整此处大小为100MB或者-1即可
 #logging:
 #  level:
 #    com.gdut: debug

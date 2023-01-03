@@ -46,7 +46,12 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
     @Transactional(propagation = Propagation.REQUIRED)
     public Result upload(MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            return Result.fail("文件不能为空!");
+            return Result.fail("文件不正确!");
+        }
+        String originalFilename = file.getOriginalFilename();
+        String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+        if(!"xlsx".equals(suffix) && !"xls".equals(suffix)){
+            return Result.fail("招生计划文件导入失败,文件不符合格式!");
         }
         // 删除所有的数据再进行导入
         remove(new QueryWrapper<Plan>());

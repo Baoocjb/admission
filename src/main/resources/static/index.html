@@ -365,11 +365,18 @@
                 this.$message('数据导入中，请稍候');
             },
 
-            refresh(){
+            refresh(response){
+                console.log(this.response);
+                // if(this.response.)
                 this.fileList = [];
                 this.selectAll();
             },
-
+            falseUp(){
+                this.$message({
+                    message: '失败',
+                    type: 'false'
+                });
+            },
             //查询所有志愿信息
             selectAll() {
                 axios({
