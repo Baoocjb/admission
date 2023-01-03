@@ -11,6 +11,7 @@ import com.gdut.admission.dto.Result;
 import com.gdut.admission.entity.Stu;
 import com.gdut.admission.listener.StuListener;
 import com.gdut.admission.service.IStuService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +37,7 @@ public class StuController {
     /**
      * 志愿文件上传
      */
+    @ApiOperation(value = "志愿文件上传")
     @PostMapping("upload")
     public Result upload(@RequestBody MultipartFile file) {
         return stuService.upload(file);
@@ -48,15 +50,16 @@ public class StuController {
      * @param pageSize
      * @return
      */
+    @ApiOperation(value = "分页显示志愿信息,并按照分数排序")
     @GetMapping("index")
     public Result index(int currentPage, int pageSize) {
-        // TODO 模糊查询
         return stuService.index(currentPage, pageSize);
     }
 
     /**
      * 修改学生志愿信息
      */
+    @ApiOperation(value = "修改学生志愿信息")
     @PostMapping("update")
     public Result updateStu(@RequestBody Stu stu) {
         return stuService.updateStu(stu);
@@ -65,6 +68,7 @@ public class StuController {
     /**
      * 删除学生志愿信息
      */
+    @ApiOperation(value = "删除学生志愿信息")
     @PostMapping("delete")
     public Result delete(Integer stuId) {
         return stuService.deleteStu(stuId);
@@ -75,6 +79,7 @@ public class StuController {
      * @param id
      * @return
      */
+    @ApiOperation(value = "根据学生id查询学生")
     @GetMapping("getOne")
     public Result getStuById(Integer id) {
         Stu stu = stuService.getById(id);
@@ -84,6 +89,12 @@ public class StuController {
         return Result.ok(stu);
     }
 
+    /**
+     * 新增学生
+     * @param stu
+     * @return
+     */
+    @ApiOperation(value = "新增学生")
     @PostMapping("add")
     public Result addStu(@RequestBody  Stu stu){
         return stuService.addStu(stu);

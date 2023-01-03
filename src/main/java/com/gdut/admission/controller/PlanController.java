@@ -6,6 +6,7 @@ import com.gdut.admission.entity.Plan;
 import com.gdut.admission.entity.Stu;
 import com.gdut.admission.service.IPlanService;
 import com.gdut.admission.service.IStuService;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -33,26 +34,28 @@ public class PlanController {
     /**
      * 招生计划文件上传
      */
+    @ApiOperation(value = "招生计划文件上传")
     @PostMapping("upload")
     public Result upload(@RequestBody MultipartFile file){
         return planService.upload(file);
     }
 
     /**
-     * 分页显示志愿信息,并按照分数排序
+     * 分页显示志愿信息, 按照计划数排序
      * @param currentPage
      * @param pageSize
      * @return
      */
+    @ApiOperation(value = "分页显示志愿信息, 按照计划数排序")
     @GetMapping("index")
     public Result index(int currentPage, int pageSize){
-        // TODO 模糊查询
         return planService.index(currentPage, pageSize);
     }
 
     /**
      * 修改招生计划
      */
+    @ApiOperation(value = "修改招生计划")
     @PostMapping("update")
     public Result update(@RequestBody Plan plan) throws IOException {
         // 修改招生计划
@@ -62,6 +65,7 @@ public class PlanController {
     /**
      * 删除招生计划
      */
+    @ApiOperation(value = "删除招生计划")
     @PostMapping("delete")
     public Result deletePlan(Integer planId){
         // 删除招生计划
@@ -73,6 +77,7 @@ public class PlanController {
      * @param id
      * @return
      */
+    @ApiOperation(value = "根据招生计划id查询招生计划")
     @GetMapping("getOne")
     public Result getPlanById(Integer id) {
         Plan plan = planService.getById(id);
@@ -82,6 +87,12 @@ public class PlanController {
         return Result.ok(plan);
     }
 
+    /**
+     * 新增招生计划
+     * @param plan
+     * @return
+     */
+    @ApiOperation(value = "新增招生计划")
     @PostMapping("add")
     public Result addPlan(@RequestBody Plan plan){
         return planService.addPlan(plan);
