@@ -64,7 +64,7 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
             return Result.fail("文件不正确!");
         }
         String originalFilename = file.getOriginalFilename();
-        String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+        String suffix = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         if(!"xlsx".equals(suffix) && !"xls".equals(suffix)){
             return Result.fail("招生计划文件导入失败,文件不符合格式!");
         }

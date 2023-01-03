@@ -336,13 +336,8 @@
                 this.fileList = [];
                 this.selectAll();
                 if(response.success != "success"){
-                    this.$message({
-                        message: response.errorMsg,
-                        type: 'false'
-                    });
+                    this.$message.error(response.errorMsg);
                 }
-                this.fileList = [];
-                this.selectAll();
 
             },
 

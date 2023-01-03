@@ -366,16 +366,11 @@
             },
 
             refresh(response){
-                console.log(this.response);
-                // if(this.response.)
+                if(response.success != "success"){
+                    this.$message.error(response.errorMsg);
+                }
                 this.fileList = [];
                 this.selectAll();
-            },
-            falseUp(){
-                this.$message({
-                    message: '失败',
-                    type: 'false'
-                });
             },
             //查询所有志愿信息
             selectAll() {
