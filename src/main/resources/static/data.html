@@ -51,11 +51,18 @@
 
             <!--中间主题表格-->
             <el-main>
+                <div>
+                    <h1 style="display: inline;margin-left:500px;">各学院专业录取情况统计</h1>
+                    <el-button type="primary" @click="search" style="display: inline;margin-left: 300px">点击展开前1%考生信息</el-button>
+                </div>
+                <br>
+                <div>
+                    <div id="CN" style="width: 315px;height: 300px;float: left"></div>
+                    <div id="JSJ" style="width: 315px;height: 300px;float: left"></div>
+                    <div id="HJ" style="width: 315px;height: 300px;float: left"></div>
+                    <div id="JD" style="width: 315px;height: 300px;float: left"></div>
+                </div>
 
-                <div id="CN" style="width: 315px;height: 300px;float: left"></div>
-                <div id="JSJ" style="width: 315px;height: 300px;float: left"></div>
-                <div id="HJ" style="width: 315px;height: 300px;float: left"></div>
-                <div id="JD" style="width: 315px;height: 300px;float: left"></div>
 
                 <template>
                     <el-table
@@ -110,6 +117,31 @@
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="totalCount">
                 </el-pagination>
+
+                <!--模糊查询结果表格窗口-->
+                <el-dialog title="条件查询结果" :visible.sync="dialogTableVisible">
+                    <el-table :data="gridData">
+                        <el-table-column property="name" label="姓名" align="center"></el-table-column>
+                        <el-table-column property="score" label="分数" align="center"></el-table-column>
+                        <el-table-column property="stuRank" label="排位" align="center"></el-table-column>
+                        <el-table-column property="collegeName" label="录取学院" align="center"></el-table-column>
+                        <el-table-column property="professionName" label="录取专业" align="center"></el-table-column>
+                        <el-table-column label="录取志愿" align="center">
+                            <template slot-scope="scope">
+                                {{ getAdStr(scope.row) }}
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                            @size-change="handleSizeChangeSearch"
+                            @current-change="handleCurrentChangeSearch"
+                            :current-page="currentPageSearch"
+                            :page-sizes="[15, 30, 40, 50]"
+                            :page-size="pageSizeSearch"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="totalCountSearch">
+                    </el-pagination>
+                </el-dialog>
 
             </el-main>
         </el-container>
@@ -199,142 +231,495 @@
                     let JDMaxScore = ['最高分'];
                     let JDMinScore = ['最低分'];
 
+                    let GL = ['管理学院'];
+                    let GLMaxScore = ['最高分'];
+                    let GLMinScore = ['最低分'];
+
+                    let JM = ['经济与贸易学院'];
+                    let JMMaxScore = ['最高分'];
+                    let JMMinScore = ['最低分'];
+
+                    let QG = ['轻工化工学院'];
+                    let QGMaxScore = ['最高分'];
+                    let QGMinScore = ['最低分'];
+
+                    let SW = ['生物医药学院'];
+                    let SWMaxScore = ['最高分'];
+                    let SWMinScore = ['最低分'];
+
+                    let TM = ['土木与交通工程学院'];
+                    let TMMaxScore = ['最高分'];
+                    let TMMinScore = ['最低分'];
+
+                    let WGY = ['外国语学院'];
+                    let WGYMaxScore = ['最高分'];
+                    let WGYMinScore = ['最低分'];
+
+                    let WL = ['物理与光电工程学院'];
+                    let WLMaxScore = ['最高分'];
+                    let WLMinScore = ['最低分'];
+
+                    let XG = ['信息工程学院'];
+                    let XGMaxScore = ['最高分'];
+                    let XGMinScore = ['最低分'];
+
+                    let YS = ['艺术与设计学院'];
+                    let YSMaxScore = ['最高分'];
+                    let YSMinScore = ['最低分'];
+
+                    let SX = ['应用数学学院'];
+                    let SXMaxScore = ['最高分'];
+                    let SXMinScore = ['最低分'];
+
+                    let ZF = ['政法学院'];
+                    let ZFMaxScore = ['最高分'];
+                    let ZFMinScore = ['最低分'];
+
+                    let ZDH = ['自动化学院'];
+                    let ZDHMaxScore = ['最高分'];
+                    let ZDHMinScore = ['最低分'];
+
                     for (let i = 0; i < resp.data.data.total; i++) {
-                        collegeName = resp.data.data.records[i].collegeName;
-                        switch (collegeName) {
-                            case '材料与能源学院':
-                                let a = CN.length;
-                                CN[a] = resp.data.data.records[i].professionName;
-                                CNMaxScore[a] = resp.data.data.records[i].maxScore;
-                                CNMinScore[a] = resp.data.data.records[i].minScore;
-                                break;
+                        if (resp.data.data.records[i].maxScore != null){
+                            collegeName = resp.data.data.records[i].collegeName;
+                            switch (collegeName) {
+                                case '材料与能源学院':
+                                    let a = CN.length;
+                                    CN[a] = resp.data.data.records[i].professionName;
+                                    CNMaxScore[a] = resp.data.data.records[i].maxScore;
+                                    CNMinScore[a] = resp.data.data.records[i].minScore;
+                                    break;
 
-                            case '环境科学与工程学院':
-                                let b = HJ.length;
-                                HJ[b] = resp.data.data.records[i].professionName;
-                                HJMaxScore[b] = resp.data.data.records[i].maxScore;
-                                HJMinScore[b] = resp.data.data.records[i].minScore;
-                                break;
+                                case '环境科学与工程学院':
+                                    let b = HJ.length;
+                                    HJ[b] = resp.data.data.records[i].professionName;
+                                    HJMaxScore[b] = resp.data.data.records[i].maxScore;
+                                    HJMinScore[b] = resp.data.data.records[i].minScore;
+                                    break;
 
-                            case '机电工程学院':
-                                let c = JD.length;
-                                JD[c] = resp.data.data.records[i].professionName;
-                                JDMaxScore[c] = resp.data.data.records[i].maxScore;
-                                JDMinScore[c] = resp.data.data.records[i].minScore;
-                                break;
+                                case '机电工程学院':
+                                    let c = JD.length;
+                                    JD[c] = resp.data.data.records[i].professionName;
+                                    JDMaxScore[c] = resp.data.data.records[i].maxScore;
+                                    JDMinScore[c] = resp.data.data.records[i].minScore;
+                                    break;
 
-                            case '计算机学院':
-                                let length = JSJ.length;
-                                JSJ[length] = resp.data.data.records[i].professionName;
-                                JSJMaxScore[length] = resp.data.data.records[i].maxScore;
-                                JSJMinScore[length] = resp.data.data.records[i].minScore;
-                                break;
+                                case '计算机学院':
+                                    let d = JSJ.length;
+                                    JSJ[d] = resp.data.data.records[i].professionName;
+                                    JSJMaxScore[d] = resp.data.data.records[i].maxScore;
+                                    JSJMinScore[d] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '管理学院':
+                                    let e = GL.length;
+                                    GL[e] = resp.data.data.records[i].professionName;
+                                    GLMaxScore[e] = resp.data.data.records[i].maxScore;
+                                    GLMinScore[e] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '经济与贸易学院':
+                                    let f = JM.length;
+                                    JM[f] = resp.data.data.records[i].professionName;
+                                    JMMaxScore[f] = resp.data.data.records[i].maxScore;
+                                    JMMinScore[f] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '轻工化工学院':
+                                    let g = QG.length;
+                                    QG[g] = resp.data.data.records[i].professionName;
+                                    QGMaxScore[g] = resp.data.data.records[i].maxScore;
+                                    QGMinScore[g] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '生物医药学院':
+                                    let h = SW.length;
+                                    SW[h] = resp.data.data.records[i].professionName;
+                                    SWMaxScore[h] = resp.data.data.records[i].maxScore;
+                                    SWMinScore[h] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '土木与交通工程学院':
+                                    let j = TM.length;
+                                    TM[j] = resp.data.data.records[i].professionName;
+                                    TMMaxScore[j] = resp.data.data.records[i].maxScore;
+                                    TMMinScore[j] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '外国语学院':
+                                    let k = WGY.length;
+                                    WGY[k] = resp.data.data.records[i].professionName;
+                                    WGYMaxScore[k] = resp.data.data.records[i].maxScore;
+                                    WGYMinScore[k] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '物理与光电工程学院':
+                                    let l = WL.length;
+                                    WL[l] = resp.data.data.records[i].professionName;
+                                    WLMaxScore[l] = resp.data.data.records[i].maxScore;
+                                    WLMinScore[l] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '信息工程学院':
+                                    let m = XG.length;
+                                    XG[m] = resp.data.data.records[i].professionName;
+                                    XGMaxScore[m] = resp.data.data.records[i].maxScore;
+                                    XGMinScore[m] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '艺术与设计学院':
+                                    let n = YS.length;
+                                    YS[n] = resp.data.data.records[i].professionName;
+                                    YSMaxScore[n] = resp.data.data.records[i].maxScore;
+                                    YSMinScore[n] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '应用数学学院':
+                                    let o = SX.length;
+                                    SX[o] = resp.data.data.records[i].professionName;
+                                    SXMaxScore[o] = resp.data.data.records[i].maxScore;
+                                    SXMinScore[o] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '政法学院':
+                                    let p = ZF.length;
+                                    ZF[p] = resp.data.data.records[i].professionName;
+                                    ZFMaxScore[p] = resp.data.data.records[i].maxScore;
+                                    ZFMinScore[p] = resp.data.data.records[i].minScore;
+                                    break;
+
+                                case '自动化学院':
+                                    let q = ZDH.length;
+                                    ZDH[q] = resp.data.data.records[i].professionName;
+                                    ZDHMaxScore[q] = resp.data.data.records[i].maxScore;
+                                    ZDHMinScore[q] = resp.data.data.records[i].minScore;
+                                    break;
+                            }
                         }
                     }
-
                     //材料能源
-                    var mChart = echarts.init(document.getElementById('CN'));
-                    var option = {
-                        legend: {},
-                        tooltip: {},
-                        dataset: {
-                            source: [
-                                CN,
-                                CNMaxScore,
-                                CNMinScore
-                            ]
-                        },
-                        xAxis: { type: 'category' },
-                        yAxis: {},
-                        series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    };
-                    mChart.setOption(option);
-
+                    this.printCN(CN,CNMaxScore,CNMinScore);
                     //计算机
-                    var mChart1 = echarts.init(document.getElementById('JSJ'));
-                    var option1 = {
-                        legend: {},
-                        tooltip: {},
-                        dataset: {
-                            source: [
-                                JSJ,
-                                JSJMaxScore,
-                                JSJMinScore
-                            ]
-                        },
-                        xAxis: { type: 'category' },
-                        yAxis: {},
-                        series: [{ type: 'bar' }, { type: 'bar' }],
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    };
-                    mChart1.setOption(option1);
-
+                    this.printJSJ(JSJ,JSJMaxScore,JSJMinScore);
                     //环境
-                    var mChart2 = echarts.init(document.getElementById('HJ'));
-                    var option2 = {
-                        legend: {},
-                        tooltip: {},
-                        dataset: {
-                            source: [
-                                HJ,
-                                HJMaxScore,
-                                HJMinScore
-                            ]
-                        },
-                        xAxis: { type: 'category' },
-                        yAxis: {},
-                        series: [{ type: 'bar' }, { type: 'bar' }],
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    };
-                    mChart2.setOption(option2);
-
+                    this.printHJ(HJ,HJMaxScore,HJMinScore);
                     //机电
-                    var mChart3 = echarts.init(document.getElementById('JD'));
-                    var option3 = {
-                        legend: {},
-                        tooltip: {},
-                        dataset: {
-                            source: [
-                                JD,
-                                JDMaxScore,
-                                JDMinScore
-                            ]
-                        },
-                        xAxis: { type: 'category' },
-                        yAxis: {},
-                        series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
-                        emphasis: {
-                            itemStyle: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    };
-                    mChart3.setOption(option3);
+                    this.printJD(JD,JDMaxScore,JDMinScore);
+                    //管理
+                    this.printGL(GL,GLMaxScore,GLMinScore);
+                    //经贸
+                    this.printJM(JM,JMMaxScore,JMMinScore);
+                    //轻工
+                    this.printQG(QG,QGMaxScore,QGMinScore);
+                    //生物医药
+                    this.printSW(SW,SWMaxScore,SWMinScore);
+                    //土木
+                    this.printTM(TM,TMMaxScore,TMMinScore);
+                    //外国语
+                    this.printWGY(WGY,WGYMaxScore,WGYMinScore);
+                    //物理
+                    this.printWL(WL,WLMaxScore,WLMinScore);
+                    //信工
+                    this.printXG(XG,XGMaxScore,XGMinScore);
+                    //艺术
+                    this.printYS(YS,YSMaxScore,YSMinScore);
+                    //数学
+                    this.printSX(SX,SXMaxScore,SXMinScore);
+                    //政法
+                    this.printZF(ZF,ZFMaxScore,ZFMinScore);
+                    //自动化
+                    this.printZDH(ZDH,ZDHMaxScore,ZDHMinScore);
 
                 })
             },
 
+            //材能
+            printCN(CN,MaxScore,MinScore){
+                var mChart = echarts.init(document.getElementById('CN'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            CN,
+                            MaxScore,
+                            MinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //计算机
+            printJSJ(JSJ,JSJMaxScore,JSJMinScore){
+                var mChart = echarts.init(document.getElementById('JSJ'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            JSJ,
+                            JSJMaxScore,
+                            JSJMinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //环境
+            printHJ(HJ,MaxScore,MinScore){
+                var mChart = echarts.init(document.getElementById('HJ'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            HJ,
+                            MaxScore,
+                            MinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //机电
+            printJD(JD,MaxScore,MinScore){
+                var mChart = echarts.init(document.getElementById('JD'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            JD,
+                            MaxScore,
+                            MinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //管理
+            printGL(GL,MaxScore,MinScore){
+                var mChart = echarts.init(document.getElementById('GL'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            GL,
+                            MaxScore,
+                            MinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //经贸
+            printJM(JM,MaxScore,MinScore){
+                var mChart = echarts.init(document.getElementById('JM'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            JM,
+                            MaxScore,
+                            MinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //轻工
+            printQG(QG,MaxScore,MinScore){
+                var mChart = echarts.init(document.getElementById('QG'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            QG,
+                            MaxScore,
+                            MinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //生物医药
+            printSW(SW,MaxScore,MinScore){
+                var mChart = echarts.init(document.getElementById('SW'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            SW,
+                            MaxScore,
+                            MinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //土木
+            printTM(TM,MaxScore,MinScore){
+                console.log(MaxScore)
+                var mChart = echarts.init(document.getElementById('TM'));
+                var option = {
+                    legend: {},
+                    tooltip: {},
+                    dataset: {
+                        source: [
+                            TM,
+                            MaxScore,
+                            MinScore
+                        ]
+                    },
+                    xAxis: { type: 'category' },
+                    yAxis: {},
+                    series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    }
+                };
+                mChart.setOption(option);
+            },
+
+            //统计前1%
+            search() {
+                axios({
+                    method: "get",
+                    url: "http://localhost:8080/admission/queryTheBest?currentPage=" + this.currentPageSearch + "&pageSize=" + this.pageSizeSearch,
+                }).then((resp) => {
+                    // 传回来他的专业代码
+                    this.dialogTableVisible = true;
+                    this.gridData = resp.data.data.records;
+                    // 设置总条目数
+                    this.totalCountSearch = resp.data.data.total;
+                })
+            },
+            handleSizeChangeSearch(val) {
+                // 重新设置每页显示的条数
+                this.pageSizeSearch = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.search();
+            },
+            handleCurrentChangeSearch(val) {
+                // 重新设置当前页码
+                this.currentPageSearch = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.search();
+            },
+            // 计算录取志愿
+            getAdStr(row){
+                if (row.professionNum == row.adOne) {
+                    return '第一志愿'
+                } else if (row.professionNum == row.adTwo) {
+                    return '第二志愿'
+                } else if (row.professionNum == row.adThree) {
+                    return '第三志愿'
+                } else if (row.professionNum == row.adFour) {
+                    return '第四志愿'
+                } else if (row.professionNum == row.adFive) {
+                    return '第五志愿'
+                } else if (row.professionNum == row.adSix) {
+                    return '第六志愿'
+                } else {
+                    return '调剂录取'
+                }
+            },
         },
 
         //数据
@@ -344,10 +729,13 @@
                 disabled: true,
                 // 总记录数量
                 totalCount: 10,
+                totalCountSearch: 10,
                 // 当前页码
                 currentPage: 1,
+                currentPageSearch: 1,
                 // 每页记录数
                 pageSize: 20,
+                pageSizeSearch: 15,
                 // 删除功能对话框
                 dialogVisible: false,
                 // 搜索表单数据
@@ -367,19 +755,9 @@
                     avgScore: ''
                 }],
                 // 表格数据
-                tableData: [{
-                    name: "小黑",
-                    score: "599",
-                    rank: "25888",
-                    number: "002",
-                    code: "0802",
-                    college: '机电学院',
-                    major: '机械类',
-                    //录取记录
-                    record: '已录取',
-                    avgScore: "233",
-                    collegeName: '',
-                }]
+                tableData: [],
+                gridData: [],
+                dialogTableVisible: false,
             }
         }
     })

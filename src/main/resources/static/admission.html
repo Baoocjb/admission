@@ -67,14 +67,22 @@
                     </el-form-item>
 
                     <el-form-item label="录取情况">
-                        <el-input v-model="admissionStuDto.status" placeholder="录取情况"></el-input>
+                        <el-select v-model="admissionStuDto.status" placeholder="录取情况">
+                            <el-option
+                                    v-for="item in statusOptions"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
                     </el-form-item>
+
                 </el-form>
 
                 <div>
                     <el-button type="primary" @click="search">条件查询录取结果</el-button>
                     <el-button type="success" @click="downloadAdmission">导出录取学生表</el-button>
-                </div>
+               </div>
 
                 <!--表格-->
                 <template>
@@ -168,96 +176,30 @@
                         :total="totalCount">
                 </el-pagination>
 
-<!--                <div class="add-form">-->
-<!--                    <el-dialog title="新增专业计划" :visible.sync="dialogFormVisible">-->
-<!--                        <el-form ref="dataAddForm" :model="formData" :rules="rules" label-position="right"-->
-<!--                                 label-width="100px">-->
-<!--                            <template>-->
-<!--                                <el-table-->
-<!--                                        :data="formData"-->
-<!--                                        style="width: 100%"-->
-<!--                                        :row-class-name="tableRowClassName">-->
-<!--                                    <el-table-column-->
-<!--                                            type="index">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="name"-->
-<!--                                            label="姓名"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="score"-->
-<!--                                            label="投档成绩"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="adOne"-->
-<!--                                            label="专业志愿1"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="adTwo"-->
-<!--                                            label="专业志愿2"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="adThree"-->
-<!--                                            label="专业志愿3"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="adFour"-->
-<!--                                            label="专业志愿4"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="adFive"-->
-<!--                                            label="专业志愿5"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="adSix"-->
-<!--                                            label="专业志愿6"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            label="服从调剂"-->
-<!--                                            align="center">-->
-<!--                                        <template slot-scope="scope">-->
-<!--                                            {{ getSwapStr(scope.row.isSwap) }}-->
-<!--                                        </template>-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="stuRank"-->
-<!--                                            label="学生排位"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="language"-->
-<!--                                            label="外语语种"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            prop="bodyTest"-->
-<!--                                            label="体检备注"-->
-<!--                                            align="center">-->
-<!--                                    </el-table-column>-->
-<!--                                    <el-table-column-->
-<!--                                            label="录取状态"-->
-<!--                                            align="center">-->
-<!--                                        <template slot-scope="scope">-->
-<!--                                            {{ getStatusStr(scope.row.status) }}-->
-<!--                                        </template>-->
-<!--                                    </el-table-column>-->
-<!--                                </el-table>-->
-<!--                            </template>-->
-<!--                        </el-form>-->
-<!--                        <div slot="footer" class="dialog-footer">-->
-<!--                            <el-button @click="dialogFormVisible = false">取消</el-button>-->
-<!--                            <el-button type="primary" @click="handleAdd()">确定</el-button>-->
-<!--                        </div>-->
-<!--                    </el-dialog>-->
-<!--                </div>-->
+                <!--模糊查询结果表格窗口-->
+                <el-dialog title="条件查询结果" :visible.sync="dialogTableVisible">
+                    <el-table :data="gridData">
+                        <el-table-column property="name" label="姓名" align="center"></el-table-column>
+                        <el-table-column property="score" label="分数" align="center"></el-table-column>
+                        <el-table-column property="stuRank" label="排位" align="center"></el-table-column>
+                        <el-table-column property="collegeName" label="录取学院" align="center"></el-table-column>
+                        <el-table-column property="professionName" label="录取专业" align="center"></el-table-column>
+                        <el-table-column label="录取志愿" align="center">
+                            <template slot-scope="scope">
+                                {{ getAdStr(scope.row) }}
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination
+                            @size-change="handleSizeChangeSearch"
+                            @current-change="handleCurrentChangeSearch"
+                            :current-page="currentPageSearch"
+                            :page-sizes="[15, 30, 40, 50]"
+                            :page-size="pageSizeSearch"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="totalCountSearch">
+                    </el-pagination>
+                </el-dialog>
 
             </el-main>
         </el-container>
@@ -298,16 +240,20 @@
             search() {
                 axios({
                     method: "post",
-                    url: "http://localhost:8080/admission/queryResult?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
+                    url: "http://localhost:8080/admission/queryResult?currentPage=" + this.currentPageSearch + "&pageSize=" + this.pageSizeSearch,
                     data: this.admissionStuDto
                 }).then((resp) => {
                     // 传回来他的专业代码
                     console.log(resp.data)
+                    this.dialogTableVisible = true;
+                    this.gridData = resp.data.data.records;
+                    // 设置总条目数
+                    this.totalCountSearch = resp.data.data.total;
                 })
             },
 
             // 导出录取学生信息
-            downloadAdmission(){
+            downloadAdmission() {
                 window.open('http://localhost:8080/admission/downloadAdmission');
             },
 
@@ -318,12 +264,25 @@
                 //调用 selectAll 函数重新分页查询数据
                 this.selectAll();
             },
+            handleSizeChangeSearch(val) {
+                // 重新设置每页显示的条数
+                this.pageSizeSearch = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.search();
+            },
             handleCurrentChange(val) {
                 // 重新设置当前页码
                 this.currentPage = val;
                 //调用 selectAll 函数重新分页查询数据
                 this.selectAll();
             },
+            handleCurrentChangeSearch(val) {
+                // 重新设置当前页码
+                this.currentPageSearch = val;
+                //调用 selectAll 函数重新分页查询数据
+                this.search();
+            },
+
             //表格变色方法
             tableRowClassName({row, rowIndex}) {
                 if (rowIndex % 2 === 1) {
@@ -333,12 +292,7 @@
                 }
                 return '';
             },
-            //表格复选框绑定事件
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
 
-                console.log(this.multipleSelection)
-            },
             //搜索表单方法
             onSubmit() {
                 //console.log(this.history);
@@ -367,6 +321,25 @@
                 }
             },
 
+            // 计算录取志愿
+            getAdStr(row){
+                if (row.professionNum == row.adOne) {
+                    return '第一志愿'
+                } else if (row.professionNum == row.adTwo) {
+                    return '第二志愿'
+                } else if (row.professionNum == row.adThree) {
+                    return '第三志愿'
+                } else if (row.professionNum == row.adFour) {
+                    return '第四志愿'
+                } else if (row.professionNum == row.adFive) {
+                    return '第五志愿'
+                } else if (row.professionNum == row.adSix) {
+                    return '第六志愿'
+                } else {
+                    return '调剂录取'
+                }
+            },
+
         },
 
         //数据
@@ -376,10 +349,13 @@
                 disabled: true,
                 // 总记录数量
                 totalCount: 10,
+                totalCountSearch: 10,
                 // 当前页码
                 currentPage: 1,
+                currentPageSearch: 1,
                 // 每页记录数
                 pageSize: 20,
+                pageSizeSearch: 15,
                 // 删除功能对话框
                 dialogVisible: false,
                 // 搜索表单数据
@@ -390,34 +366,22 @@
                     status: 4
                 },
                 // 表格数据
-                admission: [{
-                    stuName: "小黑",
-                    score: "599",
-                    stuRank: "25888",
-                    language: "英语",
-                    professionName: "日语",
-                    collegeName: '外国语学院',
-                    comment: '',
-                    location: '广州校区'
+                admission: [],
+                statusOptions: [{
+                    value: 0,
+                    label: '未录取'
                 }, {
-                    stuName: "小黑",
-                    score: "599",
-                    stuRank: "25888",
-                    language: "英语",
-                    professionName: "日语",
-                    collegeName: '外国语学院',
-                    comment: '',
-                    location: '广州校区'
+                    value: 1,
+                    label: '已录取'
                 }, {
-                    stuName: "小黑",
-                    score: "599",
-                    stuRank: "25888",
-                    language: "英语",
-                    professionName: "日语",
-                    collegeName: '外国语学院',
-                    comment: '',
-                    location: '广州校区'
-                }]
+                    value: 3,
+                    label: '调剂录取'
+                }, {
+                    value: 4,
+                    label: '不指定录取情况'
+                }],
+                gridData: [],
+                dialogTableVisible: false,
             }
         }
     })
