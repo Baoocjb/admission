@@ -522,7 +522,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
         // 分页
         MyPage<AdmissionStuDto> admissionStuDtoPage = new MyPage<>(currentPage, pageSize);
         admissionStuDtoPage.setRecords(admissionStuDtoList);
-        admissionStuDtoPage.setTotal(admissionStuDtoList.size());
+        admissionStuDtoPage.setTotal(count());
         return Result.ok(admissionStuDtoPage);
     }
 
