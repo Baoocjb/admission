@@ -46,4 +46,24 @@
         order by s.stu_rank asc
         limit #{startIndex}, #{pageSize}
     </select>
+
+    <select id="getStuCountByParams" resultType="java.lang.Integer">
+        select count(*)
+        from t_stu s left join t_admission a on s.id = a.stu_id LEFT JOIN t_plan p on a.plan_id = p.id
+        <where>
+            <if test="admissionStuDto.collegeName != null and admissionStuDto.collegeName != ''">
+                and p.college_name like concat('%', #{admissionStuDto.collegeName},'%')
+            </if>
+            <if test="admissionStuDto.professionName != null and admissionStuDto.professionName != ''">
+                and p.profession_name like concat('%', #{admissionStuDto.professionName},'%')
+            </if>
+            <if test="admissionStuDto.name != null and admissionStuDto.name != ''">
+                and s.name like concat('%', #{admissionStuDto.name},'%')
+            </if>
+            <if test="admissionStuDto.status != 4">
+                and s.status = #{admissionStuDto.status}
+            </if>
+            and s.status != 2
+        </where>
+    </select>
 </mapper>

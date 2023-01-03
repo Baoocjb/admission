@@ -519,10 +519,11 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
             admissionStuDto = new AdmissionStuDto();
         }
         List<AdmissionStuDto> admissionStuDtoList = stuService.getAdStuByParams(admissionStuDto, currentPage, pageSize);
+        int count = stuService.getAdStuCountByParams(admissionStuDto);
         // 分页
         MyPage<AdmissionStuDto> admissionStuDtoPage = new MyPage<>(currentPage, pageSize);
         admissionStuDtoPage.setRecords(admissionStuDtoList);
-        admissionStuDtoPage.setTotal(admissionStuDtoList.size());
+        admissionStuDtoPage.setTotal(count);
         return Result.ok(admissionStuDtoPage);
     }
 
@@ -530,6 +531,7 @@ public class AdmissionServiceImpl extends ServiceImpl<AdmissionMapper, Admission
     public Result getTheBestStus(AdmissionStuDto admissionStuDto, int currentPage, int pageSize) {
         if(admissionStuDto == null){
             admissionStuDto = new AdmissionStuDto();
+
         }
         List<AdmissionStuDto> admissionStuDtoList = stuService.getAdStuByParams(admissionStuDto, 1, (int)(count() * 0.01));
         // 分页

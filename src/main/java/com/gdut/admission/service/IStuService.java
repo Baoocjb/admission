@@ -32,4 +32,7 @@ public interface IStuService extends IService<Stu> {
     List<AdmissionStuDto> getAdStuByParams(AdmissionStuDto admissionStuDto, int currentPage, int pageSize);
 
     Result addStu(Stu stu);
+
+    int getAdStuCountByParams(AdmissionStuDto admissionStuDto);
+
 }

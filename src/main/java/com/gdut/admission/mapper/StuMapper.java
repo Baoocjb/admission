@@ -18,4 +18,7 @@ import java.util.List;
 public interface StuMapper extends BaseMapper<Stu> {
 
     List<Stu> getStuByParams(@Param("admissionStuDto") AdmissionStuDto admissionStuDto, @Param("startIndex") int startIndex, @Param("pageSize") int pageSize);
+
+    int getStuCountByParams(@Param("admissionStuDto")AdmissionStuDto admissionStuDto);
+
 }

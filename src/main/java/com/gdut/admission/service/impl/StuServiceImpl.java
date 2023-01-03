@@ -182,4 +182,9 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
         stuMapper.insert(stu);
         return Result.ok();
     }
+
+    @Override
+    public int getAdStuCountByParams(AdmissionStuDto admissionStuDto) {
+        return stuMapper.getStuCountByParams(admissionStuDto);
+    }
 }
