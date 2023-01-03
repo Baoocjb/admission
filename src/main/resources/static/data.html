@@ -52,8 +52,10 @@
             <!--中间主题表格-->
             <el-main>
 
-                <div id="noone" style="width: 800px;height: 600px">
-                </div>
+                <div id="CN" style="width: 315px;height: 300px;float: left"></div>
+                <div id="JSJ" style="width: 315px;height: 300px;float: left"></div>
+                <div id="HJ" style="width: 315px;height: 300px;float: left"></div>
+                <div id="JD" style="width: 315px;height: 300px;float: left"></div>
 
                 <template>
                     <el-table
@@ -175,36 +177,76 @@
             professionRange() {
                 axios({
                     method: "get",
-                    url: "http://localhost:8080/admission/profession?currentPage=1&pageSize=20",
+                    url: "http://localhost:8080/admission/profession?currentPage=1&pageSize=97",
                 }).then((resp) => {
                     // switch 获取展示的数据分组
                     // 将数据转为想要的格式
-                    let collegeNames = [];
-                    let avgScores = [];
-                    let com = ['计算机学院','材料类', '能源动力类', '微电子'];
-                    let comMaxScore = ['最高分', 43.3, 85.8, 93.7];
-                    let comMinScore = ['最低分', 83.1, 73.4, 55.1];
-                    for (let i = 0; i < resp.data.data.pageSize; i++) {
-                        collegeNames[i] = resp.data.data.records[i].professionName;
-                        avgScores[i] = resp.data.data.records[i].avgScore;
+                    let collegeName = '学院';
+
+                    let CN = ['材料与能源学院'];
+                    let CNMaxScore = ['最高分'];
+                    let CNMinScore = ['最低分'];
+
+                    let JSJ = ['计算机学院'];
+                    let JSJMaxScore = ['最高分'];
+                    let JSJMinScore = ['最低分'];
+
+                    let HJ = ['环境科学与工程学院'];
+                    let HJMaxScore = ['最高分'];
+                    let HJMinScore = ['最低分'];
+
+                    let JD = ['机电工程学院'];
+                    let JDMaxScore = ['最高分'];
+                    let JDMinScore = ['最低分'];
+
+                    for (let i = 0; i < resp.data.data.total; i++) {
+                        collegeName = resp.data.data.records[i].collegeName;
+                        switch (collegeName) {
+                            case '材料与能源学院':
+                                let a = CN.length;
+                                CN[a] = resp.data.data.records[i].professionName;
+                                CNMaxScore[a] = resp.data.data.records[i].maxScore;
+                                CNMinScore[a] = resp.data.data.records[i].minScore;
+                                break;
+
+                            case '环境科学与工程学院':
+                                let b = HJ.length;
+                                HJ[b] = resp.data.data.records[i].professionName;
+                                HJMaxScore[b] = resp.data.data.records[i].maxScore;
+                                HJMinScore[b] = resp.data.data.records[i].minScore;
+                                break;
+
+                            case '机电工程学院':
+                                let c = JD.length;
+                                JD[c] = resp.data.data.records[i].professionName;
+                                JDMaxScore[c] = resp.data.data.records[i].maxScore;
+                                JDMinScore[c] = resp.data.data.records[i].minScore;
+                                break;
+
+                            case '计算机学院':
+                                let length = JSJ.length;
+                                JSJ[length] = resp.data.data.records[i].professionName;
+                                JSJMaxScore[length] = resp.data.data.records[i].maxScore;
+                                JSJMinScore[length] = resp.data.data.records[i].minScore;
+                                break;
+                        }
                     }
-                    console.log(collegeNames);
-                    console.log(avgScores);
-                    //resp.data
-                    var mChart = echarts.init(document.getElementById('noone'));
+
+                    //材料能源
+                    var mChart = echarts.init(document.getElementById('CN'));
                     var option = {
                         legend: {},
                         tooltip: {},
                         dataset: {
                             source: [
-                                com,
-                                comMaxScore,
-                                comMinScore
+                                CN,
+                                CNMaxScore,
+                                CNMinScore
                             ]
                         },
                         xAxis: { type: 'category' },
                         yAxis: {},
-                        series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                        series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
                         emphasis: {
                             itemStyle: {
                                 shadowBlur: 10,
@@ -214,6 +256,82 @@
                         }
                     };
                     mChart.setOption(option);
+
+                    //计算机
+                    var mChart1 = echarts.init(document.getElementById('JSJ'));
+                    var option1 = {
+                        legend: {},
+                        tooltip: {},
+                        dataset: {
+                            source: [
+                                JSJ,
+                                JSJMaxScore,
+                                JSJMinScore
+                            ]
+                        },
+                        xAxis: { type: 'category' },
+                        yAxis: {},
+                        series: [{ type: 'bar' }, { type: 'bar' }],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    };
+                    mChart1.setOption(option1);
+
+                    //环境
+                    var mChart2 = echarts.init(document.getElementById('HJ'));
+                    var option2 = {
+                        legend: {},
+                        tooltip: {},
+                        dataset: {
+                            source: [
+                                HJ,
+                                HJMaxScore,
+                                HJMinScore
+                            ]
+                        },
+                        xAxis: { type: 'category' },
+                        yAxis: {},
+                        series: [{ type: 'bar' }, { type: 'bar' }],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    };
+                    mChart2.setOption(option2);
+
+                    //机电
+                    var mChart3 = echarts.init(document.getElementById('JD'));
+                    var option3 = {
+                        legend: {},
+                        tooltip: {},
+                        dataset: {
+                            source: [
+                                JD,
+                                JDMaxScore,
+                                JDMinScore
+                            ]
+                        },
+                        xAxis: { type: 'category' },
+                        yAxis: {},
+                        series: [{ type: 'bar' }, { type: 'bar' }, { type: 'bar' }, { type: 'bar' }],
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    };
+                    mChart3.setOption(option3);
+
                 })
             },
 
@@ -238,7 +356,16 @@
                 },
                 // 复选框数据集合
                 multipleSelection: [],
-                profession: '',
+                profession: [{
+                    professionNum: '',
+                    professionName: '',
+                    collegeName: '',
+                    maxScore: '',
+                    maxRank: '',
+                    minScore: '',
+                    minRank: '',
+                    avgScore: ''
+                }],
                 // 表格数据
                 tableData: [{
                     name: "小黑",
@@ -251,6 +378,7 @@
                     //录取记录
                     record: '已录取',
                     avgScore: "233",
+                    collegeName: '',
                 }]
             }
         }
