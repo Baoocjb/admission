@@ -134,32 +134,25 @@
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                label="服从调剂"
-                                align="center">
-                            <template slot-scope="scope">
-                                {{ getSwapStr(scope.row.isSwap) }}
-                            </template>
-                        </el-table-column>
-                        <el-table-column
                                 prop="stuRank"
                                 label="学生排位"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="language"
-                                label="外语语种"
+                                property="collegeName"
+                                label="录取学院"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                prop="bodyTest"
-                                label="体检备注"
+                                prop="professionName"
+                                label="录取专业"
                                 align="center">
                         </el-table-column>
                         <el-table-column
-                                label="录取状态"
+                                label="录取志愿"
                                 align="center">
                             <template slot-scope="scope">
-                                {{ getStatusStr(scope.row.status) }}
+                                {{ getAdStr(scope.row) }}
                             </template>
                         </el-table-column>
                     </el-table>
@@ -175,31 +168,6 @@
                         layout="total, sizes, prev, pager, next, jumper"
                         :total="totalCount">
                 </el-pagination>
-
-                <!--模糊查询结果表格窗口-->
-                <el-dialog title="条件查询结果" :visible.sync="dialogTableVisible">
-                    <el-table :data="gridData">
-                        <el-table-column property="name" label="姓名" align="center"></el-table-column>
-                        <el-table-column property="score" label="分数" align="center"></el-table-column>
-                        <el-table-column property="stuRank" label="排位" align="center"></el-table-column>
-                        <el-table-column property="collegeName" label="录取学院" align="center"></el-table-column>
-                        <el-table-column property="professionName" label="录取专业" align="center"></el-table-column>
-                        <el-table-column label="录取志愿" align="center">
-                            <template slot-scope="scope">
-                                {{ getAdStr(scope.row) }}
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                    <el-pagination
-                            @size-change="handleSizeChangeSearch"
-                            @current-change="handleCurrentChangeSearch"
-                            :current-page="currentPageSearch"
-                            :page-sizes="[15, 30, 40, 50]"
-                            :page-size="pageSizeSearch"
-                            layout="total, sizes, prev, pager, next, jumper"
-                            :total="totalCountSearch">
-                    </el-pagination>
-                </el-dialog>
 
             </el-main>
         </el-container>
@@ -219,36 +187,23 @@
 
         //生命周期相关方法,页面加载完成后执行的函数
         mounted() {
-            this.selectAll();
+            this.search();
         },
 
         //方法
         methods: {
 
-            selectAll() {
-                axios({
-                    method: "get",
-                    url: "http://localhost:8080/stu/index?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize
-                }).then((resp) => {
-                    // 设置表格数据
-                    this.admission = resp.data.data.records;
-                    // 设置总条目数
-                    this.totalCount = resp.data.data.total;
-                })
-            },
-
             search() {
                 axios({
                     method: "post",
-                    url: "http://localhost:8080/admission/queryResult?currentPage=" + this.currentPageSearch + "&pageSize=" + this.pageSizeSearch,
+                    url: "http://localhost:8080/admission/queryResult?currentPage=" + this.currentPage + "&pageSize=" + this.pageSize,
                     data: this.admissionStuDto
                 }).then((resp) => {
                     // 传回来他的专业代码
                     console.log(resp.data)
-                    this.dialogTableVisible = true;
-                    this.gridData = resp.data.data.records;
+                    this.admission = resp.data.data.records;
                     // 设置总条目数
-                    this.totalCountSearch = resp.data.data.total;
+                    this.totalCount = resp.data.data.total;
                 })
             },
 
@@ -262,23 +217,11 @@
                 // 重新设置每页显示的条数
                 this.pageSize = val;
                 //调用 selectAll 函数重新分页查询数据
-                this.selectAll();
-            },
-            handleSizeChangeSearch(val) {
-                // 重新设置每页显示的条数
-                this.pageSizeSearch = val;
-                //调用 selectAll 函数重新分页查询数据
                 this.search();
             },
             handleCurrentChange(val) {
                 // 重新设置当前页码
                 this.currentPage = val;
-                //调用 selectAll 函数重新分页查询数据
-                this.selectAll();
-            },
-            handleCurrentChangeSearch(val) {
-                // 重新设置当前页码
-                this.currentPageSearch = val;
                 //调用 selectAll 函数重新分页查询数据
                 this.search();
             },
@@ -380,8 +323,6 @@
                     value: 4,
                     label: '不指定录取情况'
                 }],
-                gridData: [],
-                dialogTableVisible: false,
             }
         }
     })
