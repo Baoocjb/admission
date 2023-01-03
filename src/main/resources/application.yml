@@ -7,6 +7,8 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT-PATH-MATCHER
+  banner:
+    location: classpath:banner/banner.txt
 #logging:
 #  level:
 #    com.gdut: debug
