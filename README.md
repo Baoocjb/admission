@@ -14,7 +14,7 @@
 **前端主要涉及技术**
 
 - 前端三件套 - Html, Css, JavaScript
-- Web端展示组件 - ElementUI
+- Web端展示组件 - ElementUI + Vue + axios
 - 录取结果可视化展示 - echarts
 
 **后端主要涉及技术**
