@@ -81,7 +81,7 @@
 
                 <div>
                     <el-button type="primary" @click="search">条件查询录取结果</el-button>
-                    <el-button type="success" @click="downloadAdmission">导出录取学生表</el-button>
+                    <el-button type="success" @click="downloadAdmission">导出拟录取表</el-button>
                </div>
 
                 <!--表格-->
@@ -292,13 +292,10 @@
                 disabled: true,
                 // 总记录数量
                 totalCount: 10,
-                totalCountSearch: 10,
                 // 当前页码
                 currentPage: 1,
-                currentPageSearch: 1,
                 // 每页记录数
                 pageSize: 20,
-                pageSizeSearch: 15,
                 // 删除功能对话框
                 dialogVisible: false,
                 // 搜索表单数据
@@ -315,7 +312,7 @@
                     label: '未录取'
                 }, {
                     value: 1,
-                    label: '已录取'
+                    label: '志愿录取'
                 }, {
                     value: 3,
                     label: '调剂录取'

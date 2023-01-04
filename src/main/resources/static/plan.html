@@ -168,7 +168,7 @@
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="专业代号" prop="professionNum">
-                                        <el-input v-model="formData.professionId"/>
+                                        <el-input v-model="formData.professionNum"/>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -241,7 +241,7 @@
                                 </el-col>
                                 <el-col :span="12">
                                     <el-form-item label="专业代号" prop="professionNum">
-                                        <el-input v-model="formData.professionId"/>
+                                        <el-input v-model="formData.professionNum"/>
                                     </el-form-item>
                                 </el-col>
                             </el-row>
@@ -481,8 +481,6 @@
                     if (resp.data.success) {
                         this.dialogFormVisible = false;
                         this.$message.success("添加成功");
-                    } else {
-                        this.$message.error(res.data.errorMsg);
                     }
                 }).finally(()=>{
                     this.selectAll();
