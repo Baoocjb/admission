@@ -126,7 +126,6 @@ public class StuServiceImpl extends ServiceImpl<StuMapper, Stu> implements IStuS
                 || stu.getLanguage() == null
                 || stu.getIsSwap() == null
                 || stu.getStuRank() == null
-                || stu.getId() == null
         ) {
             return false;
         }

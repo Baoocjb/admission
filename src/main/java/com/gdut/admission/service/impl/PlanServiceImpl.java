@@ -103,7 +103,6 @@ public class PlanServiceImpl extends ServiceImpl<PlanMapper, Plan> implements IP
      */
     private boolean assertPlanParams(Plan plan){
         if (plan == null
-                || plan.getId() == null
                 || plan.getGroupId() == null
                 || plan.getProfessionNum() == null
                 || plan.getProfessionName() == null
